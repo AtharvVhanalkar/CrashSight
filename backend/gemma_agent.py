@@ -69,7 +69,7 @@ def analyze_crash(app_name: str, app_type: str, description: str, uploaded_files
     """
 
     # We use a Gemma 4 equivalent model hosted on AI Studio for speed
-    model = genai.GenerativeModel('gemini-2.5-flash') 
+    model = genai.GenerativeModel('gemini-3.8-flash') 
 
     # Prepare multimodal payload
     contents = [prompt]
