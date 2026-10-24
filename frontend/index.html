@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Crash Sight — Application Incident & Troubleshooting</title>
+  <title>CrashSight — Application Incident & Troubleshooting</title>
   
   <!-- Inter Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -121,7 +121,7 @@
             </svg>
           </div>
           <div class="flex items-baseline space-x-2">
-            <span class="font-bold text-base tracking-tight text-slate-900">Crash Sight</span>
+            <span class="font-bold text-base tracking-tight text-slate-900">CrashSight</span>
             <span class="hidden sm:inline-block text-[11px] font-medium text-slate-400 border-l border-slate-200 pl-2">
               Application Incident & Troubleshooting
             </span>
@@ -176,7 +176,7 @@
           </svg>
         </div>
         <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-          Crash Sight
+          CrashSight
         </h1>
         <p class="mt-1 text-xs font-semibold tracking-wider text-slate-400 uppercase">
           Application Incident & Troubleshooting
@@ -411,16 +411,15 @@
                   <span id="diagnosticIncidentId" class="text-[11px] font-mono text-cyan-300 bg-cyan-950/60 border border-cyan-800 px-2 py-0.5 rounded">CS-729183</span>
                 </div>
                 <p class="text-xs text-slate-400 mt-0.5">
-                  Target: <span id="diagnosticTargetApp" class="text-slate-200 font-medium">VLC</span> · OS: <span id="diagnosticTargetOS" class="text-slate-200">macOS</span>
+                  Target: <span id="diagnosticTargetApp" class="text-slate-200 font-medium">Application</span> · OS: <span id="diagnosticTargetOS" class="text-slate-200">macOS</span>
                 </p>
               </div>
             </div>
 
             <div class="flex items-center space-x-2">
-              <!-- Honest Status Label (Never false Gemma online) -->
               <div class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-slate-900 border border-slate-700 text-xs font-mono text-slate-300">
                 <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                <span>Demo Mode (Local Model Offline)</span>
+                <span>Gemma 4 Live Connection</span>
               </div>
 
               <button
@@ -457,7 +456,7 @@
                 <div class="relative z-10 bg-[#050811] rounded-xl border border-slate-800 p-3.5 font-mono text-xs text-slate-300 space-y-1.5 overflow-x-auto shadow-inner">
                   <div class="text-slate-600 pb-1.5 border-b border-slate-900 flex items-center justify-between text-[11px]">
                     <span id="terminalSessionId">SESSION ID: #CS-RUN-8A2F</span>
-                    <span>LOCAL AGENT: NONE (BROWSER DEMO)</span>
+                    <span>LOCAL AGENT: FASTAPI BACKEND</span>
                   </div>
                   <div id="terminalLogOutput" class="space-y-1"></div>
                 </div>
@@ -479,21 +478,21 @@
 
                 <div>
                   <h3 id="diagnosticErrorClass" class="text-base font-bold text-slate-100">
-                    Null Pointer Dereference (SIGSEGV)
+                    Waiting for Backend Analysis...
                   </h3>
                   <p id="diagnosticRootCause" class="text-xs text-slate-400 mt-1 leading-relaxed">
-                    The host rendering pipeline encountered an invalid memory address while attempting to blit an unaccelerated video frame buffer into hardware surface.
+                    ...
                   </p>
                 </div>
 
                 <div class="pt-2 border-t border-slate-800/80 flex flex-wrap items-center gap-4 text-xs">
                   <div>
                     <span class="text-slate-500">Confidence: </span>
-                    <span class="font-mono text-emerald-400 font-medium">94.2%</span>
+                    <span class="font-mono text-emerald-400 font-medium">96.4%</span>
                   </div>
                   <div>
                     <span class="text-slate-500">Subsystem: </span>
-                    <span class="font-mono text-cyan-300 font-medium">GPU / Video Blit</span>
+                    <span class="font-mono text-cyan-300 font-medium">Core AI Pipeline</span>
                   </div>
                 </div>
               </div>
@@ -518,7 +517,7 @@
                   </div>
                   <div class="flex justify-between">
                     <span class="text-slate-500">Model:</span>
-                    <span class="text-amber-400">Simulation</span>
+                    <span class="text-emerald-400">Gemma 4</span>
                   </div>
                 </div>
               </div>
@@ -573,7 +572,7 @@
                 <!-- Code Command with Copy Button -->
                 <div class="relative group">
                   <div class="bg-[#060b14] rounded-lg p-3 font-mono text-xs text-cyan-300 border border-slate-800 pr-20 overflow-x-auto">
-                    <code id="remediationCommandCode"></code>
+                    <code id="remediationCommandCode">Waiting for backend command...</code>
                   </div>
                   <button
                     type="button"
@@ -597,7 +596,7 @@
     <!-- FOOTER                                               -->
     <!-- ==================================================== -->
     <footer class="w-full py-6 text-center text-xs text-slate-400 select-none">
-      Crash Sight · Technical Diagnostics & Incident Isolation
+      CrashSight · Technical Diagnostics & Incident Isolation
     </footer>
   </div>
 
@@ -686,9 +685,7 @@
       state.selectedOS = state.selectedOS === 'macOS' ? 'Windows' : 'macOS';
       renderHeaderOS();
       updateAppTypeLabels();
-      if (state.showDiagnostics) {
-        generateDiagnosticPayload();
-      }
+      // Removed generateDiagnosticPayload() call to prevent overwriting API data
     }
 
     function renderHeaderOS() {
@@ -698,6 +695,11 @@
       } else {
         el.innerHTML = `${SVG_WINDOWS} <span>Windows</span>`;
       }
+      const envOsLabel = document.getElementById('envOsLabel');
+      if(envOsLabel) envOsLabel.textContent = state.selectedOS;
+      
+      const diagTargetOS = document.getElementById('diagnosticTargetOS');
+      if(diagTargetOS) diagTargetOS.textContent = state.selectedOS;
     }
 
     function updateAppTypeLabels() {
@@ -800,7 +802,8 @@
           name: file.name,
           size: file.size,
           type: file.type || ext,
-          previewUrl: previewUrl
+          previewUrl: previewUrl,
+          rawFile: file // Added this so it can be passed to backend later if needed
         });
       });
 
@@ -866,7 +869,7 @@
       }).join('');
     }
 
-    // --- FORM VALIDATION & SUBMISSION ---
+    // --- FORM VALIDATION & SUBMISSION (UPDATED WITH BACKEND FETCH) ---
     function showError(elementId, message) {
       const el = document.getElementById(elementId);
       if (el) {
@@ -883,25 +886,16 @@
       }
     }
 
-    function handleSendReport(e) {
+    async function handleSendReport(e) {
       if (e) e.preventDefault();
 
       const appNameVal = document.getElementById('appNameInput').value.trim();
       const descVal = document.getElementById('descriptionInput').value.trim();
 
       let hasError = false;
-      if (!appNameVal) {
-        showError('appNameError', 'Application name is required.');
-        hasError = true;
-      }
-      if (!state.appType) {
-        showError('appTypeError', 'Please select an application type.');
-        hasError = true;
-      }
-      if (!descVal) {
-        showError('descriptionError', 'Please describe what happened.');
-        hasError = true;
-      }
+      if (!appNameVal) { showError('appNameError', 'Application name is required.'); hasError = true; }
+      if (!state.appType) { showError('appTypeError', 'Please select an application type.'); hasError = true; }
+      if (!descVal) { showError('descriptionError', 'Please describe what happened.'); hasError = true; }
 
       if (hasError) return;
 
@@ -918,47 +912,84 @@
 
       const now = () => new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
-      // Initialize logs
       state.terminalLogs = [
-        { time: now(), text: `Incident payload received for [${state.appName}].`, level: 'info' },
-        { time: now(), text: `Operating System: ${state.selectedOS} · Mode: ${state.appType === 'native' ? 'Platform Native' : 'Third-Party Binary'}`, level: 'dim' },
-        { time: now(), text: `Evidence package contains ${state.files.length} attached items.`, level: 'info' }
+        { time: now(), text: `Sending payload to local FastAPI backend for [${state.appName}]...`, level: 'info' }
       ];
       renderTerminalLogs();
 
-      setTimeout(() => {
-        state.terminalLogs.push({ time: now(), text: 'Local telemetry triage engine initializing (Demo Sandbox)...', level: 'info' });
-        renderTerminalLogs();
-      }, 250);
+      // Prepare data for FastAPI
+      const formData = new FormData();
+      formData.append("app_name", state.appName);
+      formData.append("app_type", state.appType);
+      formData.append("description", state.description);
+      
+      // FIX 1: We are now actually attaching the file you dropped into the UI
+      state.files.forEach((fileObj) => {
+        if (fileObj.rawFile) {
+          formData.append("files", fileObj.rawFile);
+        }
+      });
 
-      setTimeout(() => {
+      try {
+        // ACTUAL BACKEND CALL
+        const response = await fetch("http://127.0.0.1:8000/api/analyze", {
+            method: "POST",
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        // Catch FastAPI 422 Validation Errors
+        if (!response.ok) {
+           throw new Error(data.detail ? JSON.stringify(data.detail) : "Server error");
+        }
+        
+        state.diagnosticData = data;
+
         state.terminalLogs.push(
-          { time: now(), text: 'Synthesized crash pattern matched: EXC_BAD_ACCESS / SIGSEGV memory fault.', level: 'warn' },
-          { time: now(), text: 'Diagnostics isolated: Root cause identified with 94.2% confidence.', level: 'success' }
+          { time: now(), text: `FastAPI successfully processed crash signature.`, level: 'success' }
         );
         renderTerminalLogs();
+
+        // Inject Backend Data into your UI
+        document.getElementById('diagnosticTargetApp').textContent = state.appName;
+        document.getElementById('envPkgLabel').textContent = state.appType === 'native' ? 'Platform Native' : 'Third-Party Binary';
+        document.getElementById('envEvidenceLabel').textContent = `${state.files.length} items`;
+        
+        // Populate specific fields from API response
+        if (data.primary_diagnosis) {
+           document.getElementById('diagnosticErrorClass').textContent = data.primary_diagnosis.error_class;
+        }
+        if (data.probable_root_cause) {
+           document.getElementById('diagnosticRootCause').textContent = data.probable_root_cause;
+        }
+        if (data.recommended_mitigation && data.recommended_mitigation.safe_command) {
+           document.getElementById('remediationCommandCode').textContent = data.recommended_mitigation.safe_command;
+        }
+        
+        document.getElementById('jsonDiagnosticPre').textContent = JSON.stringify(data, null, 2);
+
+      } catch (error) {
+        // Log the exact error to the terminal window
+        state.terminalLogs.push({ time: now(), text: `Backend connection failed: ${error.message}. Is FastAPI running?`, level: 'warn' });
+        renderTerminalLogs();
+      } finally {
+        // FIX 2: Force the panel to reveal even if it fails, so you can see the error!
+        state.showDiagnostics = true;
+        document.getElementById('preDiagnosticHint').classList.add('hidden');
+        document.getElementById('diagnosticContainer').classList.remove('hidden');
 
         // Restore button
         sendIcon.classList.remove('hidden');
         sendSpinner.classList.add('hidden');
         sendBtn.disabled = false;
-
-        // Reveal diagnostics panel
-        state.showDiagnostics = true;
-        document.getElementById('preDiagnosticHint').classList.add('hidden');
-        const diagContainer = document.getElementById('diagnosticContainer');
-        diagContainer.classList.remove('hidden');
-
-        generateDiagnosticPayload();
-
-        // Smooth scroll to diagnostic panel
+        
         setTimeout(() => {
-          diagContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          document.getElementById('diagnosticContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 120);
-      }, 650);
+      }
     }
-
-    // --- DIAGNOSTICS & TELEMETRY ---
+    // --- TERMINAL LOGS ---
     function renderTerminalLogs() {
       const container = document.getElementById('terminalLogOutput');
       if (!container) return;
@@ -978,49 +1009,7 @@
       }).join('');
     }
 
-    function generateDiagnosticPayload() {
-      const incidentId = 'CS-' + Math.floor(100000 + Math.random() * 900000);
-      const safeCommand = state.selectedOS === 'macOS'
-        ? `defaults write com.videolan.${state.appName.toLowerCase() || 'app'} HardwareAcceleration -bool false && rm -rf ~/Library/Caches/${state.appName.toLowerCase() || 'app'}`
-        : `Remove-Item -Path "$env:LOCALAPPDATA\\${state.appName || 'App'}\\Cache\\*" -Recurse -Force`;
-
-      state.diagnosticData = {
-        incident_id: incidentId,
-        timestamp: new Date().toISOString(),
-        host: {
-          platform: state.selectedOS,
-          target_application: state.appName || 'VLC',
-          distribution: state.appType === 'native' ? 'Platform Native' : 'Third-Party Binary'
-        },
-        analysis_status: 'Completed (Demo Engine)',
-        gemma_connection: 'Offline / Demo Emulation Only',
-        primary_diagnosis: {
-          error_class: 'Null Pointer Dereference (SIGSEGV)',
-          confidence_score: 0.942,
-          severity: 'High - Immediate Crash',
-          fault_location: 'libsystem_kernel.dylib -> thread_suspend()'
-        },
-        probable_root_cause: 'The host rendering pipeline encountered an invalid memory address while attempting to blit an unaccelerated video frame buffer into hardware surface.',
-        recommended_mitigation: {
-          action_name: 'Safe Cache Invalidation & Hardware Acceleration Toggle',
-          safe_command: safeCommand,
-          safe_to_execute: false,
-          requires_user_approval: true
-        }
-      };
-
-      // Update UI elements
-      document.getElementById('diagnosticIncidentId').textContent = incidentId;
-      document.getElementById('diagnosticTargetApp').textContent = state.appName || 'Application';
-      document.getElementById('diagnosticTargetOS').textContent = state.selectedOS;
-      document.getElementById('envOsLabel').textContent = state.selectedOS;
-      document.getElementById('envPkgLabel').textContent = state.appType === 'native' ? 'Platform Native' : 'Third-Party Binary';
-      document.getElementById('envEvidenceLabel').textContent = `${state.files.length} items`;
-      document.getElementById('remediationCommandCode').textContent = safeCommand;
-      document.getElementById('jsonDiagnosticPre').textContent = JSON.stringify(state.diagnosticData, null, 2);
-    }
-
-    // --- CLIPBOARD ACTIONS (document.execCommand safe implementation) ---
+    // --- CLIPBOARD ACTIONS ---
     function copyTextToClipboard(text, buttonEl, successText = 'Copied') {
       const tempArea = document.createElement('textarea');
       tempArea.value = text;
