@@ -46,8 +46,8 @@ async def api_dispatch_issue(request: DispatchRequest):
     
     if not config:
         # Fallback to your own repository if they test a random app name not in the dictionary
-        repo_owner = "your_github_username"  # <-- CHANGE THIS TO YOUR USERNAME
-        repo_name = "CrashSight"             # <-- CHANGE THIS TO YOUR REPO
+        repo_owner = "AtharvVhanalkar"  
+        repo_name = "CrashSight"             
     else:
         repo_owner = config["github_owner"]
         repo_name = config["github_repo"]
