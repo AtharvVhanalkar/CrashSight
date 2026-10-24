@@ -381,11 +381,7 @@ For bugs, include the relevant error message, steps to reproduce the issue, and 
 
 ---
 
-## 📄 License
 
-Refer to the repository's license file for licensing information. If no license file exists, contact the repository maintainer before redistributing or using the project under an assumed open-source license.
-
----
 
 ## 👨‍💻 Repository
 
