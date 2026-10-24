@@ -42,6 +42,15 @@
       100% { transform: translateX(0) scaleY(1); }
     }
 
+    /* Moving green bar shimmer & pulse animation */
+    @keyframes greenBarShimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(250%); }
+    }
+    .green-bar-shimmer {
+      animation: greenBarShimmer 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
     .aura-layer-1 {
       animation: auraDrift1 14s ease-in-out infinite;
     }
@@ -53,7 +62,7 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .aura-layer-1, .aura-layer-2, .aura-layer-wave {
+      .aura-layer-1, .aura-layer-2, .aura-layer-wave, .green-bar-shimmer {
         animation: none !important;
         transform: none !important;
       }
@@ -65,23 +74,23 @@
       height: 6px;
     }
     ::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.6);
+      background: rgba(241, 245, 249, 0.8);
     }
     ::-webkit-scrollbar-thumb {
-      background: rgba(100, 116, 139, 0.4);
+      background: rgba(148, 163, 184, 0.5);
       border-radius: 9999px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: rgba(100, 116, 139, 0.7);
+      background: rgba(100, 116, 139, 0.8);
     }
   </style>
 </head>
-<body class="min-h-screen bg-[#f8fafc] text-slate-900 font-sans relative selection:bg-emerald-100 selection:text-emerald-900 flex flex-col justify-between overflow-x-hidden">
+<body id="appBody" class="min-h-screen bg-[#f8fafc] text-slate-900 font-sans relative selection:bg-emerald-100 selection:text-emerald-900 flex flex-col justify-between overflow-x-hidden transition-colors duration-300">
 
   <!-- ==================================================== -->
-  <!-- GLOBAL AMBIENT BACKGROUND AURA (SVG Fluid Geometry)  -->
+  <!-- GLOBAL AMBIENT BACKGROUND AURA                       -->
   <!-- ==================================================== -->
-  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
+  <div id="ambientAuraContainer" class="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
     <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[400px] bg-gradient-to-b from-sky-100/40 via-emerald-50/20 to-transparent blur-3xl opacity-70"></div>
     <svg class="absolute bottom-0 left-0 w-full h-[320px] md:h-[420px] opacity-75 text-sky-100" viewBox="0 0 1440 400" fill="none" preserveAspectRatio="none">
       <path d="M0 240C240 180 480 300 720 220C960 140 1200 240 1440 190V400H0V240Z" fill="url(#aura-grad-1)" />
@@ -106,7 +115,6 @@
     
     <!-- ==================================================== -->
     <!-- 1. TOP UTILITY NAVIGATION BAR                        -->
-    <!-- Positioned directly ABOVE the application name bar   -->
     <!-- ==================================================== -->
     <nav id="topNavBar" class="w-full border-b border-slate-200/70 bg-white/95 backdrop-blur-md sticky top-0 z-40 text-xs text-slate-600 transition-colors duration-200">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 h-9 flex items-center justify-between">
@@ -132,143 +140,134 @@
             </svg>
           </button>
 
-          <!-- Dropdown Popover Menu -->
+          <!-- Dropdown Popover Menu (4 Pages) -->
           <div
             id="topNavDropdownMenu"
-            class="hidden absolute left-0 mt-1.5 w-52 rounded-xl bg-white border border-slate-200 shadow-xl py-1 z-50 text-xs transition-all duration-150"
+            class="hidden absolute left-0 mt-1.5 w-60 rounded-xl bg-white border border-slate-200 shadow-xl py-1 z-50 text-xs transition-all duration-150"
           >
             <div class="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400 border-b border-slate-100 flex items-center justify-between">
-              <span>Navigation</span>
-              <span class="text-[9px] font-mono text-slate-400">3 views</span>
+              <span>Workflow Navigation</span>
+              <span class="text-[9px] font-mono text-slate-400">4 steps</span>
             </div>
 
             <!-- Option 1: Home -->
             <button
               type="button"
               onclick="selectNavOption('page1')"
-              class="top-nav-option w-full text-left px-3 py-2 flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer group"
-              data-page="page1"
+              class="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors text-slate-700 hover:text-slate-900 cursor-pointer"
             >
-              <span class="flex items-center space-x-2">
-                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <div class="flex items-center space-x-2">
+                <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                   <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
-                <span class="font-medium">Home</span>
-              </span>
-              <span id="badgePage1" class="text-[10px] font-mono font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Active</span>
+                <span>1. Welcome</span>
+              </div>
+              <span id="badgePage1" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
             </button>
 
-            <!-- Option 2: Report an Issue -->
+            <!-- Option 2: Select Application -->
             <button
               type="button"
               onclick="selectNavOption('page2')"
-              class="top-nav-option w-full text-left px-3 py-2 flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer group"
-              data-page="page2"
+              class="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors text-slate-700 hover:text-slate-900 cursor-pointer"
             >
-              <span class="flex items-center space-x-2">
-                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M12 20h9"></path>
-                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+              <div class="flex items-center space-x-2">
+                <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  <line x1="8" y1="21" x2="16" y2="21"></line>
+                  <line x1="12" y1="17" x2="12" y2="21"></line>
                 </svg>
-                <span class="font-medium">Report an Issue</span>
-              </span>
-              <span id="badgePage2" class="hidden text-[10px] font-mono font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Active</span>
+                <span>2. Select Application</span>
+              </div>
+              <span id="badgePage2" class="hidden w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
             </button>
 
-            <!-- Option 3: Diagnostics -->
+            <!-- Option 3: Describe Problem -->
             <button
               type="button"
               onclick="selectNavOption('page3')"
-              class="top-nav-option w-full text-left px-3 py-2 flex items-center justify-between hover:bg-slate-50 transition-colors cursor-pointer group"
-              data-page="page3"
+              class="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors text-slate-700 hover:text-slate-900 cursor-pointer"
             >
-              <span class="flex items-center space-x-2">
-                <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="4 17 10 11 4 5"></polyline>
-                  <line x1="12" y1="19" x2="20" y2="19"></line>
+              <div class="flex items-center space-x-2">
+                <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
                 </svg>
-                <span class="font-medium">Diagnostics</span>
-              </span>
-              <span id="badgePage3" class="hidden text-[10px] font-mono font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Active</span>
+                <span>3. Describe Problem</span>
+              </div>
+              <span id="badgePage3" class="hidden w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            </button>
+
+            <!-- Option 4: Diagnosis & Recovery -->
+            <button
+              type="button"
+              onclick="selectNavOption('page4')"
+              class="w-full px-3 py-2 text-left hover:bg-slate-50 flex items-center justify-between transition-colors text-slate-700 hover:text-slate-900 cursor-pointer"
+            >
+              <div class="flex items-center space-x-2">
+                <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                </svg>
+                <span>4. Diagnosis & Recovery</span>
+              </div>
+              <span id="badgePage4" class="hidden w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
             </button>
           </div>
         </div>
 
-        <!-- Right: Expandable Search Component -->
+        <!-- Right: Interactive Search Input & Dropdown -->
         <div class="relative" id="topSearchContainer">
-          <div class="flex items-center space-x-1">
-            <!-- Expandable Search Input Wrapper -->
-            <div id="searchBarWrapper" class="relative flex items-center">
-              <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              <input
-                id="topSearchInput"
-                type="text"
-                placeholder="Search Crash Sight…"
-                autocomplete="off"
-                class="w-44 sm:w-60 pl-8 pr-7 py-1 rounded-full text-xs text-slate-800 placeholder-slate-400 bg-slate-100 border border-slate-200 focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-1 focus:ring-emerald-500/20 transition-all"
-                oninput="handleSearchInput(event)"
-                onfocus="handleSearchFocus()"
-                onkeydown="handleSearchKeyDown(event)"
-              />
-              <button
-                type="button"
-                id="searchClearBtn"
-                onclick="clearSearchInput()"
-                class="hidden absolute right-2 text-slate-400 hover:text-slate-600 p-0.5 rounded cursor-pointer"
-                title="Clear query"
-              >
-                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </button>
-            </div>
-
-            <!-- Icon Trigger for Search (Focus Shortcut) -->
+          <div class="relative flex items-center">
+            <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input
+              type="text"
+              id="topSearchInput"
+              placeholder="Search Crash Sight…"
+              onfocus="handleSearchFocus()"
+              oninput="handleSearchInput(event)"
+              onkeydown="handleSearchKeyDown(event)"
+              class="w-44 sm:w-60 pl-8 pr-7 py-1 rounded-full text-xs text-slate-800 placeholder-slate-400 bg-slate-100 border border-slate-200 focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-1 focus:ring-emerald-500/20 transition-all"
+            />
             <button
               type="button"
-              id="searchToggleBtn"
-              onclick="focusSearchInput()"
-              class="p-1 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
-              title="Search Crash Sight"
-              aria-label="Search"
+              id="searchClearBtn"
+              onclick="clearSearchInput()"
+              class="hidden absolute right-2 text-slate-400 hover:text-slate-600 cursor-pointer"
             >
-              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
+              ✕
             </button>
           </div>
 
-          <!-- Search Results Dropdown -->
+          <!-- Live Search Results Dropdown -->
           <div
             id="searchResultsDropdown"
-            class="hidden absolute right-0 mt-1.5 w-72 sm:w-80 rounded-xl bg-white border border-slate-200 shadow-xl p-2 z-50 text-xs transition-all max-h-80 overflow-y-auto"
+            class="hidden absolute right-0 mt-1.5 w-72 sm:w-80 rounded-xl bg-white border border-slate-200 shadow-xl p-2 z-50 text-xs text-slate-800 max-h-80 overflow-y-auto"
           >
             <div id="searchResultsHeader" class="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400 border-b border-slate-100 flex justify-between items-center mb-1">
-              <span>Matching Content</span>
-              <span id="searchResultsCount" class="font-mono text-[9px] text-slate-400">0 results</span>
+              <span>Matching Records</span>
+              <span id="searchResultsCount" class="font-mono text-[9px] text-slate-400">0 items</span>
             </div>
             <div id="searchResultsList" class="space-y-1"></div>
           </div>
         </div>
-
       </div>
     </nav>
 
     <!-- ==================================================== -->
-    <!-- 2. APPLICATION NAME BAR (HEADER BAR)                 -->
-    <!-- Positioned below top utility navigation bar          -->
+    <!-- 2. MAIN APPLICATION HEADER                           -->
     <!-- ==================================================== -->
     <header id="mainAppHeader" class="w-full border-b border-slate-200/80 bg-white/70 backdrop-blur-md sticky top-9 z-30 transition-colors duration-200">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+        
         <!-- Brand Identity -->
-        <div class="flex items-center space-x-2.5 select-none cursor-pointer" onclick="navigateTo('page1')">
-          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 shadow-sm">
+        <div onclick="navigateTo('page1')" class="flex items-center space-x-2.5 select-none cursor-pointer">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 shadow-xs">
             <svg class="w-5 h-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
               <path d="m9 12 2 2 4-4" stroke="#10b981" stroke-width="2.5" />
@@ -276,63 +275,85 @@
             </svg>
           </div>
           <div class="flex items-baseline space-x-2">
-            <span class="font-bold text-base tracking-tight text-slate-900" id="mainHeaderTitle">Crash Sight</span>
-            <span class="hidden sm:inline-block text-[11px] font-medium text-slate-400 border-l border-slate-200 pl-2">
+            <span class="font-bold text-base tracking-tight text-slate-900" id="headerBrandTitle">Crash Sight</span>
+            <span class="hidden sm:inline-block text-[11px] font-medium text-slate-400 border-l border-slate-200 pl-2" id="headerBrandSubtitle">
               Application Incident & Troubleshooting
             </span>
           </div>
         </div>
 
-        <!-- Page 2 Header Controls -->
-        <div id="page2HeaderControls" class="hidden flex items-center space-x-2">
-          <!-- OS Status Pill (Without switch button) -->
-          <div class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200/80 text-xs font-medium text-slate-700">
+        <!-- Right Side: OS Badge & Back Navigation -->
+        <div class="flex items-center space-x-2.5">
+          <!-- Operating System Badge -->
+          <div id="headerOsBadgeContainer" class="hidden items-center space-x-1.5 px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200/80 text-xs font-medium text-slate-700">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span id="headerOsDisplay" class="flex items-center space-x-1"></span>
           </div>
 
-          <!-- Back to Welcome Navigation -->
+          <!-- Dynamic Back Button -->
           <button
             type="button"
-            onclick="navigateTo('page1')"
-            class="inline-flex items-center text-xs font-semibold text-slate-600 hover:text-slate-900 px-2.5 py-1 rounded-md hover:bg-slate-100 transition-colors cursor-pointer"
+            id="headerBackBtn"
+            onclick="handleHeaderBack()"
+            class="hidden inline-flex items-center text-xs font-semibold text-slate-600 hover:text-slate-900 px-2.5 py-1 rounded-md hover:bg-slate-100 transition-colors cursor-pointer"
           >
             <svg class="w-3.5 h-3.5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="19" y1="12" x2="5" y2="12"></line>
               <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
-            <span>Welcome</span>
-          </button>
-        </div>
-
-        <!-- Page 3 Header Controls -->
-        <div id="page3HeaderControls" class="hidden flex items-center space-x-2">
-          <div class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-xs font-mono text-cyan-300">
-            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-            <span id="page3HeaderOsDisplay"></span>
-          </div>
-
-          <!-- Back to Report Action (Preserves report) -->
-          <button
-            type="button"
-            onclick="navigateTo('page2')"
-            class="inline-flex items-center text-xs font-semibold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/70 px-3 py-1 rounded-md transition-colors cursor-pointer"
-          >
-            <svg class="w-3.5 h-3.5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12"></line>
-              <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-            <span>Back to Report</span>
+            <span id="headerBackBtnText">Back</span>
           </button>
         </div>
       </div>
     </header>
 
     <!-- ==================================================== -->
+    <!-- 3. FOUR-STEP WORKFLOW STEPPER                        -->
+    <!-- Displayed on Pages 2, 3, and 4                       -->
+    <!-- ==================================================== -->
+    <div id="workflowStepperContainer" class="hidden w-full border-b border-slate-200/70 bg-white/50 backdrop-blur-xs py-2.5 transition-colors duration-200">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6">
+        <div class="flex items-center justify-between sm:justify-center sm:space-x-8 text-xs font-medium text-slate-400">
+          
+          <!-- Step 1: Application -->
+          <div id="stepperStep1" class="flex items-center space-x-1.5 cursor-pointer" onclick="navigateTo('page2')">
+            <span id="stepperStep1Num" class="w-5 h-5 rounded-full flex items-center justify-center font-mono text-[11px] font-bold border border-emerald-500 bg-emerald-500 text-white">1</span>
+            <span id="stepperStep1Label" class="text-slate-800 font-semibold">Application</span>
+          </div>
+          
+          <div class="hidden sm:block w-8 h-px bg-slate-200"></div>
+
+          <!-- Step 2: Problem -->
+          <div id="stepperStep2" class="flex items-center space-x-1.5 cursor-pointer" onclick="if(state.appName) navigateTo('page3')">
+            <span id="stepperStep2Num" class="w-5 h-5 rounded-full flex items-center justify-center font-mono text-[11px] font-bold border border-slate-200 bg-slate-100 text-slate-500">2</span>
+            <span id="stepperStep2Label" class="text-slate-500">Problem</span>
+          </div>
+
+          <div class="hidden sm:block w-8 h-px bg-slate-200"></div>
+
+          <!-- Step 3: Diagnosis -->
+          <div id="stepperStep3" class="flex items-center space-x-1.5">
+            <span id="stepperStep3Num" class="w-5 h-5 rounded-full flex items-center justify-center font-mono text-[11px] font-bold border border-slate-200 bg-slate-100 text-slate-500">3</span>
+            <span id="stepperStep3Label" class="text-slate-500">Diagnosis</span>
+          </div>
+
+          <div class="hidden sm:block w-8 h-px bg-slate-200"></div>
+
+          <!-- Step 4: Recovery -->
+          <div id="stepperStep4" class="flex items-center space-x-1.5">
+            <span id="stepperStep4Num" class="w-5 h-5 rounded-full flex items-center justify-center font-mono text-[11px] font-bold border border-slate-200 bg-slate-100 text-slate-500">4</span>
+            <span id="stepperStep4Label" class="text-slate-500">Recovery</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================================================== -->
     <!-- PAGE 1: WELCOME SCREEN                               -->
     <!-- ==================================================== -->
     <main id="page1" class="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-12 text-center max-w-2xl mx-auto my-auto transition-all duration-300">
-      <!-- Hero Logo -->
+      <!-- Crash Sight Central Branding -->
       <div class="flex flex-col items-center mb-6">
         <div class="w-16 h-16 rounded-2xl bg-gradient-to-b from-white to-slate-50 border border-slate-200 shadow-md shadow-slate-200/50 flex items-center justify-center mb-4 transition-transform hover:scale-105">
           <svg class="w-8 h-8 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -341,22 +362,20 @@
             <circle cx="12" cy="12" r="1.5" fill="currentColor" />
           </svg>
         </div>
-        <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-          Crash Sight
-        </h1>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">Crash Sight</h1>
         <p class="mt-1 text-xs font-semibold tracking-wider text-slate-400 uppercase">
           Application Incident & Troubleshooting
         </p>
       </div>
 
-      <!-- Animated Information Carousel -->
+      <!-- Animated Rotating Information Section -->
       <div class="w-full h-16 flex items-center justify-center overflow-hidden mb-8 px-2" aria-live="polite">
         <p id="carouselText" class="text-base sm:text-lg text-slate-600 font-normal leading-snug transition-all duration-300 ease-out transform">
           Report software crashes without the hassle.
         </p>
       </div>
 
-      <!-- Continue Button with Flowing Blue Aura Waves -->
+      <!-- Continue Action with Flowing Blue Aura Waves -->
       <div class="relative inline-flex group">
         <div class="absolute -inset-2.5 pointer-events-none overflow-hidden rounded-full z-0 select-none opacity-45 group-hover:opacity-85 group-hover:scale-105 transition-all duration-300">
           <div class="absolute -inset-[25%] aura-layer-1" style="background: radial-gradient(ellipse at 50% 50%, rgba(37,131,255,0.50) 0%, rgba(117,221,255,0.38) 45%, rgba(221,245,255,0.45) 75%, transparent 90%); filter: blur(10px);"></div>
@@ -366,7 +385,7 @@
         <button
           type="button"
           onclick="navigateTo('page2')"
-          class="relative z-10 inline-flex items-center justify-center px-8 py-3 rounded-full text-sm font-semibold text-slate-800 bg-white/95 hover:bg-emerald-600 active:bg-emerald-700 hover:text-white border border-slate-300/80 hover:border-emerald-600 shadow-sm hover:shadow-lg hover:shadow-emerald-600/20 active:scale-95 transition-all duration-250 ease-out focus:outline-none focus:ring-2 focus:ring-emerald-500/40 cursor-pointer"
+          class="relative z-10 inline-flex items-center justify-center px-8 py-3 rounded-full text-sm font-semibold text-slate-800 bg-white/95 hover:bg-emerald-600 active:bg-emerald-700 hover:text-white border border-slate-300/80 hover:border-emerald-600 shadow-xs hover:shadow-lg hover:shadow-emerald-600/20 active:scale-95 transition-all duration-250 ease-out focus:outline-none focus:ring-2 focus:ring-emerald-500/40 cursor-pointer"
         >
           <span>Continue</span>
           <svg class="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -378,73 +397,250 @@
     </main>
 
     <!-- ==================================================== -->
-    <!-- PAGE 2: INCIDENT REPORTING (CLEAN REFINED LAYOUT)    -->
-    <!-- Adjusted Issue Description deeper down the page      -->
+    <!-- PAGE 2: SELECT APPLICATION                           -->
+    <!-- Dedicated application identification screen          -->
     <!-- ==================================================== -->
-    <main id="page2" class="hidden flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-12 transition-all duration-300">
-      <!-- Title -->
-      <div class="mb-8">
+    <main id="page2" class="hidden flex-1 max-w-2xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-12 transition-all duration-300">
+      
+      <div class="mb-8 text-center sm:text-left">
+        <span class="text-xs font-mono font-semibold tracking-wider text-emerald-700 uppercase bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full inline-block mb-2">
+          Step 1 of 4
+        </span>
         <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-          Report an incident
+          Which application are you having trouble with?
         </h1>
         <p class="mt-1.5 text-sm text-slate-500">
-          Tell us which app failed and what happened. Evidence is optional but helps.
+          Select the application that is freezing, crashing, or not responding.
         </p>
       </div>
 
-      <!-- Main Reporting Form Card -->
-      <form id="incidentForm" onsubmit="handleSendReport(event)" class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-9">
+      <!-- Application Selection Card -->
+      <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 sm:p-8 space-y-6">
         
-        <!-- Section 1: Application Context Header & Name -->
-        <div class="space-y-2">
-          <div class="text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
-            Application Context
-          </div>
-          <div>
-            <label for="appNameInput" class="block text-sm font-semibold text-slate-800 mb-2">
-              Application Name
-            </label>
-            <div class="relative group rounded-lg">
-              <div class="absolute -inset-1 pointer-events-none overflow-hidden rounded-lg z-0 select-none opacity-20 group-hover:opacity-40 group-focus-within:opacity-80 transition-opacity duration-300">
-                <div class="absolute -inset-[20%] aura-layer-1" style="background: radial-gradient(ellipse at 35% 40%, rgba(37,131,255,0.32) 0%, rgba(117,221,255,0.28) 45%, rgba(221,245,255,0.4) 75%, transparent 90%); filter: blur(10px);"></div>
-              </div>
+        <!-- Search / Custom Application Input with Blue Aura -->
+        <div>
+          <label for="p2AppSearchInput" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
+            Search or Type Application Name
+          </label>
+          <div class="relative group rounded-xl">
+            <div class="absolute -inset-1 pointer-events-none overflow-hidden rounded-xl z-0 select-none opacity-20 group-hover:opacity-40 group-focus-within:opacity-80 transition-opacity duration-300">
+              <div class="absolute -inset-[20%] aura-layer-1" style="background: radial-gradient(ellipse at 35% 40%, rgba(37,131,255,0.32) 0%, rgba(117,221,255,0.28) 45%, rgba(221,245,255,0.4) 75%, transparent 90%); filter: blur(10px);"></div>
+            </div>
+            <div class="relative z-10 flex items-center">
+              <svg class="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
               <input
-                id="appNameInput"
+                id="p2AppSearchInput"
                 type="text"
-                placeholder="e.g. VLC, Chrome, VS Code"
-                class="relative z-10 w-full px-4 py-3 rounded-lg border border-slate-200 text-sm text-slate-900 placeholder-slate-400 bg-white/95 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
-                oninput="handleAppNameChange(this.value)"
+                placeholder="Search: VLC Media Player, VS Code, OBS Studio, Discord, Blinkit"
+                oninput="handleAppInput(this.value)"
+                class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-900 placeholder-slate-400 bg-white/95 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
               />
             </div>
-            <p id="appNameError" class="hidden mt-1.5 text-xs text-rose-500 font-medium"></p>
+          </div>
+          <p id="p2AppError" class="hidden mt-1.5 text-xs text-rose-500 font-medium"></p>
+        </div>
+
+        <!-- Quick Pick Known Applications Directory -->
+        <div>
+          <div class="flex items-center justify-between mb-2.5">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Available Applications (Select 1 of 5)</span>
+            <span class="text-[11px] text-slate-400">Click to select</span>
+          </div>
+
+          <div id="p2AppGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+            <!-- App cards generated by JS -->
           </div>
         </div>
 
-        <!-- Section 2: Issue Description & Evidence (Positioned Lower with Separator & Generous Top Spacing) -->
-        <div class="mt-12 sm:mt-16 pt-8 sm:pt-10 border-t border-slate-100/90 space-y-3">
-          <div class="flex items-center justify-between">
-            <label class="block text-sm font-semibold text-slate-800">
-              Issue Description & Evidence
+        <!-- Selected Application Summary Container -->
+        <div id="p2SelectedSummaryCard" class="hidden p-4 rounded-xl border border-emerald-200 bg-emerald-50/60 transition-all flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div id="p2SelectedIcon" class="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-sm">
+              💻
+            </div>
+            <div>
+              <div class="text-[11px] text-emerald-700 font-semibold uppercase tracking-wider">Selected Application</div>
+              <div id="p2SelectedName" class="text-sm font-bold text-slate-900">Chrome</div>
+            </div>
+          </div>
+          <button
+            type="button"
+            onclick="clearSelectedApp()"
+            class="text-xs text-slate-500 hover:text-slate-800 underline font-medium px-2 py-1 cursor-pointer"
+          >
+            Change
+          </button>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+          <button
+            type="button"
+            onclick="navigateTo('page1')"
+            class="inline-flex items-center text-xs font-semibold text-slate-600 hover:text-slate-900 px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer"
+          >
+            <svg class="w-3.5 h-3.5 mr-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>Back</span>
+          </button>
+
+          <button
+            type="button"
+            onclick="handlePage2Continue()"
+            class="inline-flex items-center justify-center px-6 py-2.5 rounded-xl text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 shadow-xs shadow-emerald-600/20 active:scale-95 transition-all cursor-pointer"
+          >
+            <span>Continue</span>
+            <svg class="w-3.5 h-3.5 ml-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Helper Notice -->
+      <div class="mt-6 flex items-center space-x-2 text-xs text-slate-400 px-3 py-2 rounded-lg bg-slate-50/80 border border-slate-200/60">
+        <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
+        <span>Selection is manual. Crash Sight does not perform unprompted background file-system scans.</span>
+      </div>
+    </main>
+
+    <!-- ==================================================== -->
+    <!-- PAGE 3: DESCRIBE THE PROBLEM                         -->
+    <!-- Problem description, symptom picker, evidence upload -->
+    <!-- ==================================================== -->
+    <main id="page3" class="hidden flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-12 transition-all duration-300">
+      
+      <!-- Heading & Header Context -->
+      <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <span class="text-xs font-mono font-semibold tracking-wider text-emerald-700 uppercase bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full inline-block mb-1.5">
+            Step 2 of 4
+          </span>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            What is going wrong?
+          </h1>
+          <p class="mt-1 text-sm text-slate-500">
+            Describe the issue and attach any screenshots or files that help explain it.
+          </p>
+        </div>
+
+        <!-- Selected Application Recap Badge -->
+        <div class="flex items-center space-x-2 p-2.5 rounded-xl border border-slate-200 bg-white shadow-xs">
+          <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs" id="p3AppIconBadge">
+            💻
+          </div>
+          <div>
+            <div class="text-[10px] text-slate-400 font-semibold uppercase">Troubleshooting</div>
+            <div class="text-xs font-bold text-slate-800 truncate max-w-[130px]" id="p3AppNameBadge">VLC</div>
+          </div>
+          <button
+            type="button"
+            onclick="navigateTo('page2')"
+            class="text-[11px] text-emerald-600 hover:text-emerald-700 font-medium underline pl-1 cursor-pointer"
+          >
+            Change
+          </button>
+        </div>
+      </div>
+
+      <!-- Form Container -->
+      <form onsubmit="handlePage3Submit(event)" class="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 sm:p-8 space-y-7">
+        
+        <!-- Select Inference Engine -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Select Inference Engine
             </label>
-            <span class="text-[11px] text-slate-400 font-medium">Describe below & attach logs or media</span>
+            <span class="text-[11px] text-slate-400">Choose processing environment</span>
           </div>
 
-          <div class="flex flex-col md:flex-row items-stretch gap-3.5 pt-1">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="inferenceEngineContainer">
+            <!-- Option 1: Gemma 4 (Local AI) -->
+            <button
+              type="button"
+              id="engineGemmaBtn"
+              onclick="selectInferenceEngine('gemma')"
+              class="p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50/70 text-left transition-all cursor-pointer flex items-start space-x-3 group shadow-xs"
+            >
+              <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">
+                ⚡
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-emerald-800">Gemma 4 (Local AI)</span>
+                  <span id="badgeEngineGemma" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                </div>
+                <p class="text-[11px] text-slate-500 mt-0.5">Runs on-device via local weights</p>
+              </div>
+            </button>
+
+            <!-- Option 2: Cloud API -->
+            <button
+              type="button"
+              id="engineCloudBtn"
+              onclick="selectInferenceEngine('cloud')"
+              class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white hover:border-slate-300 text-left transition-all cursor-pointer flex items-start space-x-3 group"
+            >
+              <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center text-sm flex-shrink-0 mt-0.5 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors">
+                ☁️
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-emerald-700">Cloud API</span>
+                  <span id="badgeEngineCloud" class="hidden w-2 h-2 rounded-full bg-emerald-500"></span>
+                </div>
+                <p class="text-[11px] text-slate-500 mt-0.5">High-speed remote cloud endpoint</p>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Optional Symptom Selector -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Primary Symptom (Optional)
+            </label>
+            <span class="text-[11px] text-slate-400">Helps tailor recovery steps</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2" id="symptomChipsContainer">
+            <!-- Chips generated by JS -->
+          </div>
+        </div>
+
+        <!-- Issue Description & Evidence Composer -->
+        <div class="space-y-3 pt-2">
+          <div class="flex items-center justify-between">
+            <label for="p3DescriptionInput" class="block text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Issue Description <span class="text-rose-500">*</span>
+            </label>
+            <span class="text-[11px] text-slate-400">Describe what happened</span>
+          </div>
+
+          <div class="flex flex-col md:flex-row items-stretch gap-3.5">
             <!-- Left: Evidence Dropzone with Cyan/Electric-Blue Aura -->
             <div class="relative md:w-56 flex-shrink-0 group">
-              <div id="dropzoneAura" class="absolute -inset-1 pointer-events-none overflow-hidden rounded-xl z-0 select-none opacity-30 group-hover:opacity-65 transition-opacity duration-300">
+              <div id="p3DropzoneAura" class="absolute -inset-1 pointer-events-none overflow-hidden rounded-xl z-0 select-none opacity-30 group-hover:opacity-65 transition-opacity duration-300">
                 <div class="absolute -inset-[25%] aura-layer-1" style="background: radial-gradient(ellipse at 35% 40%, rgba(37,131,255,0.35) 0%, rgba(117,221,255,0.30) 45%, rgba(221,245,255,0.4) 75%, transparent 90%); filter: blur(10px);"></div>
               </div>
               <div
-                id="dropzone"
-                onclick="document.getElementById('fileInput').click()"
+                id="p3Dropzone"
+                onclick="document.getElementById('p3FileInput').click()"
                 ondragover="handleDragOver(event)"
                 ondragleave="handleDragLeave(event)"
                 ondrop="handleDrop(event)"
                 class="relative z-10 h-full border border-dashed border-slate-200/90 bg-slate-50/80 hover:bg-slate-100/90 hover:border-slate-300 rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer transition-all min-h-[160px]"
               >
                 <input
-                  id="fileInput"
+                  id="p3FileInput"
                   type="file"
                   multiple
                   accept="image/*,video/*,.log,.txt,.json"
@@ -469,374 +665,328 @@
                 <div class="absolute -inset-[20%] aura-layer-1" style="background: radial-gradient(ellipse at 35% 40%, rgba(37,131,255,0.32) 0%, rgba(117,221,255,0.28) 45%, rgba(221,245,255,0.4) 75%, transparent 90%); filter: blur(10px);"></div>
               </div>
               <textarea
-                id="descriptionInput"
+                id="p3DescriptionInput"
                 rows="7"
-                placeholder="Describe the error, what you were doing, and what happened..."
+                placeholder="Describe what happens when you open or use the application. For example, it freezes on the loading screen, crashes when I click a button, or stops responding after a few minutes."
                 class="relative z-10 w-full h-full p-4 rounded-xl border border-slate-200 text-sm text-slate-900 placeholder-slate-400 bg-white/95 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none leading-relaxed"
                 oninput="handleDescriptionChange(this.value)"
               ></textarea>
             </div>
-
-            <!-- Right: Send Button with Aura (Navigates to Page 3) -->
-            <div class="relative flex md:flex-col justify-end items-stretch group">
-              <div class="absolute -inset-1 pointer-events-none overflow-hidden rounded-xl z-0 select-none opacity-40 group-hover:opacity-85 transition-opacity duration-300">
-                <div class="absolute -inset-[25%] aura-layer-1" style="background: radial-gradient(ellipse at 50% 50%, rgba(37,131,255,0.50) 0%, rgba(117,221,255,0.38) 45%, rgba(221,245,255,0.45) 75%, transparent 90%); filter: blur(10px);"></div>
-              </div>
-              <button
-                id="sendBtn"
-                type="submit"
-                class="relative z-10 w-full md:w-14 h-12 md:h-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center shadow-sm shadow-emerald-600/30 hover:shadow-emerald-600/40 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/40 cursor-pointer"
-                title="Send and proceed to diagnostics"
-                aria-label="Send Report and Analyze"
-              >
-                <span id="sendBtnIcon">
-                  <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" fillOpacity="0.2"></polygon>
-                  </svg>
-                </span>
-                <span id="sendBtnSpinner" class="hidden">
-                  <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                </span>
-              </button>
-            </div>
           </div>
 
-          <!-- Validation Errors -->
-          <p id="descriptionError" class="hidden text-xs text-rose-500 font-medium"></p>
-          <p id="filesError" class="hidden text-xs text-rose-500 font-medium"></p>
+          <p id="p3DescriptionError" class="hidden text-xs text-rose-500 font-medium"></p>
+          <!-- Navigation Buttons -->
+          <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+            <button
+              type="button"
+              onclick="navigateTo('page2')"
+              class="inline-flex items-center text-xs font-semibold text-slate-600 hover:text-slate-900 px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer"
+            >
+              <svg class="w-3.5 h-3.5 mr-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+              <span>Back</span>
+            </button>
 
-          <!-- Uploaded Evidence Chips -->
-          <div id="evidencePreviewSection" class="hidden pt-3">
-            <div id="evidenceCountLabel" class="text-xs font-semibold text-slate-500 mb-2">Attached Evidence (0/6)</div>
-            <div id="evidenceGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2"></div>
+            <button
+              type="submit"
+              id="p3DiagnoseBtn"
+              class="inline-flex items-center justify-center px-6 py-2.5 rounded-xl text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 shadow-xs shadow-emerald-600/20 active:scale-95 transition-all cursor-pointer"
+            >
+              <span>Diagnose & Continue</span>
+              <svg class="w-3.5 h-3.5 ml-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </button>
           </div>
-        </div>
-      </form>
-
-      <!-- Pre-submission Hint -->
-      <div class="mt-8 flex items-center space-x-2 text-xs text-slate-400 px-3 py-2.5 rounded-lg bg-slate-50/80 border border-slate-200/60">
-        <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
-        <span>Submitting will safely isolate the incident and open the dedicated diagnostics execution interface.</span>
-      </div>
-    </main>
+        </form>
+      </main>
 
     <!-- ==================================================== -->
-    <!-- PAGE 3: EXECUTION & DIAGNOSTICS (DEDICATED PAGE)    -->
+    <!-- PAGE 4: DIAGNOSTIC & RESOLUTION CENTER               -->
+    <!-- Technical Workaround, Bug Report & Escalation        -->
     <!-- ==================================================== -->
-    <main id="page3" class="hidden flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-10 transition-all duration-300">
+    <main id="page4" class="hidden flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-10 transition-all duration-300">
       
-      <!-- Page 3 Heading & Actions Bar -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <!-- Top Title Bar -->
+      <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <div class="flex items-center space-x-2">
-            <span class="text-xs font-mono font-semibold tracking-wider text-emerald-600 uppercase bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
-              Phase 3 · Execution & Diagnostics
+          <div class="flex items-center space-x-2 mb-1.5">
+            <span class="text-xs font-mono font-semibold tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+              Step 4 of 4
             </span>
-            <span id="p3IncidentBadge" class="text-xs font-mono text-cyan-700 bg-cyan-50 border border-cyan-200 px-2 py-0.5 rounded">
-              CS-RUNNING
+            <span class="text-xs font-mono text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded flex items-center space-x-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span id="p4EngineBadgeText">Gemma 4 Triage Engine</span>
             </span>
           </div>
-          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1.5">
-            Incident Diagnostic Engine
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            Diagnostic & Resolution Center
           </h1>
-          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Target: <span id="p3TargetAppTitle" class="font-semibold text-slate-800"></span> · 
-            Host: <span id="p3HostOsTitle" class="font-semibold text-slate-800"></span>
+          <p class="text-sm text-slate-500 mt-1">
+            Step 1: Try local workaround. Step 2: Escalate if unresolved.
           </p>
         </div>
 
-        <div class="flex items-center space-x-2">
-          <button
-            type="button"
-            onclick="restartAnalysis()"
-            class="inline-flex items-center text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white border border-slate-300 hover:border-slate-400 px-3 py-2 rounded-lg shadow-2xs transition-all cursor-pointer"
-          >
-            <svg class="w-3.5 h-3.5 mr-1.5 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
-            </svg>
-            <span>Re-Analyze</span>
-          </button>
-
-          <button
-            type="button"
-            onclick="navigateTo('page2')"
-            class="inline-flex items-center text-xs font-semibold text-emerald-800 hover:text-emerald-900 bg-emerald-100/80 hover:bg-emerald-200/80 border border-emerald-300 px-3.5 py-2 rounded-lg shadow-2xs transition-all cursor-pointer"
-          >
-            <svg class="w-3.5 h-3.5 mr-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12"></line>
-              <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-            <span>Back to Report</span>
-          </button>
-        </div>
+        <button
+          type="button"
+          onclick="navigateTo('page3')"
+          class="self-start sm:self-auto inline-flex items-center text-xs font-semibold text-slate-600 hover:text-slate-900 px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer shadow-xs"
+        >
+          <svg class="w-3.5 h-3.5 mr-1.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Back to Report</span>
+        </button>
       </div>
 
-      <!-- Execution Status Card (Progress & Honest AI Status) -->
-      <section class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-4 sm:p-5 mb-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
-          <div class="flex items-center space-x-3">
-            <div id="p3StatusPillIndicator" class="w-3 h-3 rounded-full bg-amber-400 animate-ping"></div>
-            <div>
-              <div class="flex items-center space-x-2">
-                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Execution Status:</span>
-                <span id="p3StatusText" class="text-xs font-bold font-mono text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded">
-                  Analyzing Telemetry...
-                </span>
-              </div>
-              <p id="p3StatusDetail" class="text-xs text-slate-500 mt-0.5">
-                Parsing incident stack trace and attached memory dump...
-              </p>
+      <!-- Container for all Page 4 Sections -->
+      <div class="space-y-6">
+
+        <!-- 1. RECOMMENDED LOCAL WORKAROUND -->
+        <section class="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-5 sm:p-6 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2 text-xs font-mono font-bold uppercase tracking-wider text-emerald-700">
+              <span>🛠</span>
+              <span>Recommended Local Workaround</span>
             </div>
+            <span id="p4AppBadge" class="text-[11px] font-mono font-semibold text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded">
+              VS Code
+            </span>
           </div>
 
-          <div class="flex items-center space-x-2">
-            <!-- Honest Status Tag -->
-            <div class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-xs font-mono text-slate-700">
-              <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-              <span>Demo Mode (Local Model Offline)</span>
+          <p id="p4WorkaroundRootCause" class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+            Root Cause: Extension Host process event-loop starvation or Language Server Protocol (LSP) memory exhaustion causing typing latency and editor input thread stalls.
+          </p>
+
+          <!-- Command Snippet Box -->
+          <div class="relative group mt-2">
+            <div class="bg-slate-900 rounded-xl p-3.5 pr-20 font-mono text-xs sm:text-sm text-emerald-400 border border-slate-800 overflow-x-auto shadow-inner">
+              <code id="p4WorkaroundCmd">code --disable-extensions</code>
             </div>
-          </div>
-        </div>
-
-        <!-- Dynamic Staged Progress Bar -->
-        <div class="pt-3">
-          <div class="flex justify-between text-xs text-slate-500 font-mono mb-1">
-            <span id="p3ProgressStageLabel">Stage 2 of 3: Memory Fault Isolation</span>
-            <span id="p3ProgressPercent">65%</span>
-          </div>
-          <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden border border-slate-200/70">
-            <div id="p3ProgressBar" class="bg-emerald-500 h-2 rounded-full transition-all duration-500" style="width: 65%;"></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Submitted Report Recap (Preserved user context) -->
-      <section class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-4 sm:p-5 mb-6">
-        <div class="flex items-center justify-between mb-3">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">User Report Context</span>
-          <button
-            type="button"
-            onclick="navigateTo('page2')"
-            class="text-xs text-emerald-600 hover:text-emerald-700 font-medium underline cursor-pointer"
-          >
-            Edit this report
-          </button>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/80">
-            <span class="text-slate-400 font-medium block mb-1">Application Target</span>
-            <div id="p3RecapApp" class="font-semibold text-slate-800 text-sm"></div>
-            <div class="text-slate-500 mt-0.5">Target Platform: macOS</div>
+            <button
+              type="button"
+              id="p4CopyCmdBtn"
+              onclick="copyWorkaroundCommand(this)"
+              class="absolute right-2 top-2 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono transition-colors border border-slate-700 cursor-pointer shadow-xs"
+            >
+              Copy
+            </button>
           </div>
 
-          <div class="md:col-span-2 p-3 bg-slate-50 rounded-xl border border-slate-200/80">
-            <span class="text-slate-400 font-medium block mb-1">Incident Description</span>
-            <p id="p3RecapDescription" class="text-slate-700 leading-relaxed italic"></p>
-          </div>
-        </div>
-
-        <!-- Evidence Chips Preview -->
-        <div id="p3EvidenceRecapSection" class="mt-3 pt-3 border-t border-slate-100">
-          <div class="text-xs text-slate-400 font-medium mb-2">Submitted Evidence:</div>
-          <div id="p3EvidenceChips" class="flex flex-wrap gap-2"></div>
-        </div>
-      </section>
-
-      <!-- Dark Technical Diagnostic Interface (Reference 2 Aesthetic) -->
-      <div class="relative group">
-        <div class="absolute -inset-2 pointer-events-none overflow-hidden rounded-2xl z-0 select-none opacity-50 group-hover:opacity-75 transition-opacity duration-500">
-          <div class="absolute -inset-[22%] aura-layer-1" style="background: radial-gradient(ellipse at 30% 35%, rgba(37,131,255,0.45) 0%, rgba(117,221,255,0.22) 45%, transparent 75%); filter: blur(12px);"></div
-          <div class="absolute -inset-[26%] aura-layer-2" style="background: radial-gradient(ellipse at 70% 65%, rgba(117,221,255,0.32) 0%, rgba(37,131,255,0.25) 50%, transparent 80%); filter: blur(15px);"></div>
-        </div>
-
-        <section class="relative z-10 rounded-2xl bg-[#090e17] border border-slate-800 shadow-xl overflow-hidden">
-          
-          <!-- Terminal Header -->
-          <div class="border-b border-slate-800 bg-[#0d1524] px-5 py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div class="flex items-center space-x-2.5">
-              <div class="w-3 h-3 rounded-full bg-rose-500/80"></div>
-              <div class="w-3 h-3 rounded-full bg-amber-500/80"></div>
-              <div class="w-3 h-3 rounded-full bg-emerald-500/80"></div>
-              <span class="text-xs font-mono text-slate-400 ml-2">crashsight-terminal-sandbox :: execution-pipeline</span>
+          <!-- Self Heal Action Row -->
+          <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="text-xs text-slate-500">
+              <span class="font-semibold text-slate-700">Auto Remediation:</span> Execute automated runtime isolation and local environment patch.
             </div>
-            <div class="text-[11px] font-mono text-cyan-300">
-              SESSION: <span id="p3SessionId"></span>
-            </div>
+            <button
+              type="button"
+              id="p4SelfHealBtn"
+              onclick="handleSelfHealClick()"
+              class="inline-flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-xs shadow-emerald-600/20 active:scale-95 transition-all cursor-pointer flex-shrink-0"
+            >
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+              </svg>
+              <span>Self Heal</span>
+            </button>
           </div>
 
-          <div class="p-5 sm:p-6 space-y-6">
-            
-            <!-- Terminal Execution Telemetry -->
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <div class="flex items-center text-xs font-mono text-slate-400">
-                  <svg class="w-3.5 h-3.5 mr-1.5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="4 17 10 11 4 5"></polyline>
-                    <line x1="12" y1="19" x2="20" y2="19"></line>
-                  </svg>
-                  <span>Execution Pipeline Telemetry</span>
-                </div>
-                <span class="text-[11px] font-mono text-emerald-400 bg-emerald-950/50 px-2 py-0.5 rounded border border-emerald-800/50">
-                  Live Log Output
-                </span>
+          <!-- Self Heal Success Output Banner -->
+          <div id="p4SelfHealStatus" class="hidden p-3 rounded-xl border border-emerald-200 bg-emerald-50/70 text-xs text-emerald-900 animate-fadeIn"></div>
+        </section>
+
+        <!-- 2. VERIFICATION & ESCALATION CARD -->
+        <section class="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-5 sm:p-6 space-y-4">
+          <h2 class="text-sm sm:text-base font-bold text-slate-900">
+            Did the local workaround resolve your issue?
+          </h2>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              id="p4BtnSolved"
+              onclick="handleWorkaroundResult(true)"
+              class="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-xs transition-all cursor-pointer"
+            >
+              <span>✓</span>
+              <span>Yes, Problem Solved</span>
+            </button>
+
+            <button
+              type="button"
+              id="p4BtnBroken"
+              onclick="handleWorkaroundResult(false)"
+              class="inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 shadow-xs transition-all cursor-pointer"
+            >
+              <span>✕</span>
+              <span>No, Still Broken (Escalate)</span>
+            </button>
+          </div>
+
+          <!-- Outcome State 1: Solved Confirmation (Welcome!) -->
+          <div id="p4SolvedOutcome" class="hidden p-5 rounded-xl border border-emerald-200 bg-emerald-50/80 text-xs text-emerald-950 animate-fadeIn">
+            <div class="flex items-start space-x-3">
+              <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-lg flex-shrink-0">
+                ✓
               </div>
-
-              <div class="bg-[#050811] rounded-xl border border-slate-800 p-3.5 font-mono text-xs text-slate-300 space-y-1 overflow-x-auto shadow-inner max-h-56">
-                <div id="p3TerminalLogOutput" class="space-y-1"></div>
-              </div>
-            </div>
-
-            <!-- Structured AI Diagnosis Card & Host Metadata -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <!-- Left 2 Cols: Primary Diagnosis -->
-              <div class="lg:col-span-2 bg-[#0d1524] rounded-xl border border-slate-800 p-4 space-y-3">
-                <div class="flex items-center justify-between">
-                  <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    Primary Diagnosis
-                  </div>
-                  <span id="p3SeverityBadge" class="px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-rose-950/70 text-rose-300 border border-rose-800/60">
-                    High - Immediate Crash
-                  </span>
-                </div>
-
-                <div>
-                  <h3 id="p3ErrorClass" class="text-base font-bold text-slate-100">
-                    Null Pointer Dereference (SIGSEGV)
-                  </h3>
-                  <p id="p3RootCause" class="text-xs text-slate-400 mt-1 leading-relaxed">
-                    The host rendering pipeline encountered an invalid memory address while attempting to blit an unaccelerated video frame buffer into hardware surface.
-                  </p>
-                </div>
-
-                <div class="pt-2 border-t border-slate-800/80 flex flex-wrap items-center gap-4 text-xs">
-                  <div>
-                    <span class="text-slate-500">Confidence: </span>
-                    <span class="font-mono text-emerald-400 font-medium">94.2%</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-500">Subsystem: </span>
-                    <span class="font-mono text-cyan-300 font-medium">GPU / Video Blit</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-500">Fault: </span>
-                    <span class="font-mono text-slate-300">libsystem_kernel.dylib</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Right 1 Col: Host Environment Details -->
-              <div class="bg-[#0d1524] rounded-xl border border-slate-800 p-4 space-y-2 text-xs font-mono">
-                <div class="text-slate-400 font-sans font-semibold uppercase tracking-wider text-[11px]">
-                  Host Environment
-                </div>
-                <div class="space-y-1.5 text-slate-300">
-                  <div class="flex justify-between">
-                    <span class="text-slate-500">OS:</span>
-                    <span id="p3EnvOs" class="text-white"></span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="text-slate-500">Platform:</span>
-                    <span id="p3EnvPkg" class="text-slate-300">macOS</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="text-slate-500">Evidence:</span>
-                    <span id="p3EnvEvidence" class="text-slate-300"></span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="text-slate-500">Inference:</span>
-                    <span class="text-amber-400">Sandbox Demo</span>
-                  </div>
+              <div class="flex-1">
+                <div class="font-extrabold text-lg text-slate-900 tracking-tight">Welcome!</div>
+                <p class="mt-1 text-xs text-emerald-800 leading-relaxed font-medium">
+                  Your application issue has been resolved successfully and is ready to use. All systems are back to normal operation.
+                </p>
+                <div class="mt-3.5 flex items-center space-x-2">
+                  <button
+                    type="button"
+                    onclick="navigateTo('page1')"
+                    class="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-xs transition-colors"
+                  >
+                    Finish Session
+                  </button>
+                  <button
+                    type="button"
+                    onclick="promptResetSession()"
+                    class="px-3.5 py-2 rounded-xl text-xs font-medium text-emerald-800 hover:bg-emerald-100/80 border border-emerald-300/60 cursor-pointer transition-colors"
+                  >
+                    Start New Session
+                  </button>
                 </div>
               </div>
             </div>
-
-            <!-- Extracted Stack Evidence / System Logs -->
-            <div class="bg-[#0d1524] rounded-xl border border-slate-800 p-4">
-              <div class="flex items-center justify-between mb-2">
-                <div class="text-xs font-mono text-slate-400 flex items-center">
-                  <svg class="w-3.5 h-3.5 mr-1.5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                  </svg>
-                  <span>System Diagnostic Logs (Extracted Stack Trace)</span>
-                </div>
-                <span class="text-[10px] font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-700">
-                  Demo Evidence Pattern
-                </span>
-              </div>
-              <div id="p3StackEvidence" class="bg-[#050811] rounded-lg p-3 font-mono text-[11px] text-cyan-300/90 border border-slate-800 overflow-x-auto leading-relaxed"></div>
-            </div>
-
-            <!-- Structured JSON Diagnostic Payload -->
-            <div>
-              <div class="flex items-center justify-between mb-1.5">
-                <span class="text-xs font-mono text-slate-400">Structured Diagnostic Payload (JSON)</span>
-                <button
-                  type="button"
-                  id="p3CopyJsonBtn"
-                  onclick="copyP3Json()"
-                  class="text-xs text-cyan-400 hover:text-cyan-300 transition-colors font-mono cursor-pointer"
-                >
-                  Copy JSON
-                </button>
-              </div>
-              <pre id="p3JsonOutput" class="bg-[#050811] rounded-xl border border-slate-800 p-3 text-[11px] font-mono text-emerald-300 overflow-x-auto max-h-48 leading-snug"></pre>
-            </div>
-
-            <!-- Safe Sandbox Remediation Action -->
-            <div class="bg-[#0d1829] border border-cyan-900/40 rounded-xl p-4 sm:p-5">
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-                <div>
-                  <div class="flex items-center text-sm font-semibold text-cyan-200">
-                    <svg class="w-4 h-4 mr-1.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                      <path d="m9 12 2 2 4-4" />
-                    </svg>
-                    <span>Recommended Remediation (Approval Required)</span>
-                  </div>
-                  <p class="text-xs text-slate-400 mt-0.5">
-                    Browser sandbox prevents automatic OS modification. Review and simulate the safe command below.
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  id="p3SimulateBtn"
-                  onclick="handleP3SimulateAction()"
-                  class="inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm transition-all cursor-pointer"
-                >
-                  <span id="p3SimulateBtnText">Approve & Simulate Action</span>
-                </button>
-              </div>
-
-              <!-- Command Code with Copy Action -->
-              <div class="relative group">
-                <div class="bg-[#060b14] rounded-lg p-3 font-mono text-xs text-cyan-300 border border-slate-800 pr-20 overflow-x-auto">
-                  <code id="p3RemediationCommand"></code>
-                </div>
-                <button
-                  type="button"
-                  id="p3CopyCmdBtn"
-                  onclick="copyP3Command()"
-                  class="absolute right-2 top-2 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-sans transition-colors border border-slate-700 cursor-pointer"
-                >
-                  Copy
-                </button>
-              </div>
-            </div>
-
           </div>
         </section>
-      </div>
 
+        <!-- 3. GEMMA-GENERATED BUG REPORT & REPORT ISSUE (SHOWN ONLY ON 'NO, STILL BROKEN') -->
+        <div id="p4BrokenOutcome" class="hidden space-y-4 animate-fadeIn">
+          <!-- Bug Report Card -->
+          <section class="space-y-2">
+            <div class="flex items-center justify-between px-1">
+              <div class="text-xs font-mono font-bold uppercase tracking-wider text-slate-500">
+                Gemma-Generated Bug Report
+              </div>
+              <button
+                type="button"
+                onclick="copyGemmaReport(this)"
+                class="text-xs text-emerald-700 hover:text-emerald-800 font-mono font-semibold flex items-center space-x-1.5 cursor-pointer"
+              >
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span id="p4CopyReportLabel">Copy Report</span>
+              </button>
+            </div>
+
+            <div class="bg-slate-900 rounded-2xl border border-slate-800 p-5 font-mono text-xs text-slate-200 leading-relaxed shadow-xs overflow-x-auto">
+              <pre id="p4GemmaReportPre" class="whitespace-pre-wrap font-mono"></pre>
+            </div>
+          </section>
+
+          <!-- Escalation Section with Swapped Order -->
+          <section class="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-5 sm:p-6 space-y-4">
+            <!-- 1. Escalate Unresolved Incident Target Card (Positioned at Top) -->
+            <div id="p4DispatchedTargetCard" class="hidden p-4 rounded-xl border border-emerald-500/30 bg-emerald-50/60 text-xs animate-fadeIn">
+              <div class="min-w-0">
+                <div class="font-bold text-slate-900 flex items-center space-x-1.5">
+                  <span class="text-emerald-600 font-bold">✓</span>
+                  <span>Escalate Unresolved Incident: <strong id="p4DispatchedTargetName">VS Code Official Support Desk</strong></span>
+                </div>
+                <div class="mt-1">
+                  <a id="p4DispatchedTargetUrl" href="https://code.visualstudio.com/docs/supporting/troubleshoot" target="_blank" rel="noopener noreferrer" class="font-mono text-[11px] text-emerald-700 hover:text-emerald-800 hover:underline inline-flex items-center space-x-1">
+                    <span>https://code.visualstudio.com/docs/supporting/troubleshoot</span>
+                    <svg class="w-3 h-3 ml-0.5 text-emerald-600 inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <polyline points="15 3 21 3 21 9"></polyline>
+                      <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Escalation Channels -->
+            <div id="p4EscalationSection" class="space-y-3.5">
+              <div class="text-xs font-bold text-slate-800">
+                Where would you like to escalate?
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  id="p4EscalateGithubBtn"
+                  onclick="selectEscalationChannel('github')"
+                  class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-emerald-50/40 hover:border-emerald-300 flex items-center space-x-2.5 text-xs font-semibold text-slate-800 transition-all cursor-pointer group"
+                >
+                  <span class="text-base">🐙</span>
+                  <span class="group-hover:text-emerald-700">GitHub Issue Tracker</span>
+                </button>
+
+                <button
+                  type="button"
+                  id="p4EscalateOfficialBtn"
+                  onclick="selectEscalationChannel('official')"
+                  class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-emerald-50/40 hover:border-emerald-300 flex items-center space-x-2.5 text-xs font-semibold text-slate-800 transition-all cursor-pointer group"
+                >
+                  <span class="text-base">🌐</span>
+                  <span class="group-hover:text-emerald-700">Official Website Ticket</span>
+                </button>
+              </div>
+
+              <!-- 2. Escalate Unresolved Incident Row with Report Issue Button (Positioned at Bottom) -->
+              <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h3 class="text-sm font-bold text-slate-900">Escalate Unresolved Incident</h3>
+                  <p class="text-xs text-slate-500 mt-0.5">Submit the generated bug report directly to application support channels.</p>
+                </div>
+
+                <!-- Button: Report Issue -->
+                <button
+                  type="button"
+                  id="p4ReportIssueBtn"
+                  onclick="handleReportIssueClick()"
+                  class="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-xs shadow-emerald-600/20 active:scale-95 transition-all cursor-pointer flex-shrink-0"
+                >
+                  <span>🚨</span>
+                  <span>Report Issue</span>
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+
+      </div>
     </main>
+
+    <!-- In-App Notification Modal (Replaces alert() / confirm()) -->
+    <div id="appToastModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-sm w-full p-5 text-center">
+        <div id="modalIconContainer" class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <h3 id="appToastTitle" class="text-base font-bold text-slate-900 mb-1">Session Completed</h3>
+        <p id="appToastMsg" class="text-xs text-slate-600 leading-relaxed mb-4"></p>
+        <div id="modalActionButtons" class="flex items-center space-x-2">
+          <button
+            type="button"
+            onclick="closeToastModal()"
+            class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold cursor-pointer transition-colors"
+          >
+            Got it
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- ==================================================== -->
     <!-- FOOTER                                               -->
     <!-- ==================================================== -->
-    <footer class="w-full py-6 text-center text-xs text-slate-400 select-none">
+    <footer id="appFooter" class="w-full py-6 text-center text-xs text-slate-400 select-none transition-colors duration-200">
       Crash Sight · Technical Diagnostics & Incident Isolation
     </footer>
   </div>
@@ -845,83 +995,242 @@
   <!-- APPLICATION LOGIC (Vanilla JavaScript)               -->
   <!-- ==================================================== -->
   <script>
-    // State Store
-    const state = {
-      activePage: 'page1',
-      selectedOS: 'macOS',
-      appName: '',
-      description: '',
-      files: [],
-      isSubmitting: false,
-      incidentId: 'CS-729183',
-      sessionId: 'RUN-' + Math.floor(Date.now() / 1000).toString(16).toUpperCase(),
-      diagnosticData: null,
-      terminalLogs: [],
-      simulatedState: 'idle'
-    };
-
-    // Page 1 Carousel Messages
+    // Carousel State for Page 1
+    let carouselInterval = null;
+    let carouselIdx = 0;
     const CAROUSEL_MESSAGES = [
       "Report software crashes without the hassle.",
       "Attach screenshots, videos, and error logs.",
       "Understand errors with AI-powered diagnostics.",
       "Find possible causes and recommended solutions."
     ];
-    let carouselIdx = 0;
-    let carouselInterval = null;
 
-    // Brand OS Icons SVG
+    // Accurate Apple Vector
     const SVG_APPLE = `<svg class="w-3.5 h-3.5 fill-current inline-block mr-1" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 0.93-2.85-.9.04-1.99.6-2.64 1.35-.57.65-1.07 1.72-.94 2.74 1.01.08 2.03-.49 2.65-1.24z"/></svg>`;
 
-    // --- NAVIGATION CONTROLLER (3 PAGES) ---
+    // The 5 Allowed Applications Directory
+    const COMMON_APPS = [
+      { name: "VLC Media Player", icon: "🎬", category: "Media Player" },
+      { name: "VS Code", icon: "💻", category: "Development" },
+      { name: "OBS Studio", icon: "🎥", category: "Broadcasting" },
+      { name: "Discord", icon: "🎧", category: "Communication" },
+      { name: "Blinkit", icon: "⚡", category: "Quick Commerce" }
+    ];
+
+    // Symptom Presets
+    const SYMPTOM_OPTIONS = [
+      { id: "frozen", label: "Application is frozen", icon: "❄️" },
+      { id: "crashes", label: "Application crashes", icon: "💥" },
+      { id: "loading", label: "Stuck on loading", icon: "⏳" },
+      { id: "slow", label: "Application is slow", icon: "🐌" },
+      { id: "error", label: "Error message appears", icon: "⚠️" },
+      { id: "other", label: "Other problem", icon: "❓" }
+    ];
+
+    // Global Shared Application State
+    const state = {
+      activePage: 'page1',
+      selectedOS: 'macOS',
+      appName: '',
+      appIcon: '💻',
+      inferenceEngine: 'gemma',
+      selectedSymptom: '',
+      description: '',
+      files: [],
+      incidentId: 'CS-' + Math.floor(100000 + Math.random() * 900000),
+      isAnalyzing: false,
+      symptomType: 'Application Unresponsive',
+      likelyCauses: [],
+      recoverySteps: [],
+      activeStepIndex: 0,
+      expandedStepIndex: 0,
+      activityLogs: [],
+      verificationChoice: null
+    };
+
+    // --- NAVIGATION CONTROLLER ---
     function navigateTo(pageId) {
+      if (state.activePage === pageId) return;
+
+      const p1 = document.getElementById('page1');
+      const p2 = document.getElementById('page2');
+      const p3 = document.getElementById('page3');
+      const p4 = document.getElementById('page4');
+
+      p1.classList.add('hidden');
+      p2.classList.add('hidden');
+      p3.classList.add('hidden');
+      p4.classList.add('hidden');
+
       state.activePage = pageId;
 
-      const page1El = document.getElementById('page1');
-      const page2El = document.getElementById('page2');
-      const page3El = document.getElementById('page3');
+      const targetEl = document.getElementById(pageId);
+      if (targetEl) targetEl.classList.remove('hidden');
 
-      const headerP2Controls = document.getElementById('page2HeaderControls');
-      const headerP3Controls = document.getElementById('page3HeaderControls');
-
-      // Hide all pages first
-      page1El.classList.add('hidden');
-      page2El.classList.add('hidden');
-      page3El.classList.add('hidden');
-
-      headerP2Controls.classList.add('hidden');
-      headerP3Controls.classList.add('hidden');
-
-      // Update Top Nav Dropdown Active Indicators
       updateDropdownActiveState(pageId);
-
-      // Update Theme styling for Navigation Bar based on active page
-      updateThemeForPage(pageId);
-
-      if (pageId === 'page1') {
-        page1El.classList.remove('hidden');
-        startCarousel();
-      } else if (pageId === 'page2') {
-        page2El.classList.remove('hidden');
-        headerP2Controls.classList.remove('hidden');
-        headerP2Controls.classList.add('flex');
-        stopCarousel();
-        renderHeaderOS();
-      } else if (pageId === 'page3') {
-        page3El.classList.remove('hidden');
-        headerP3Controls.classList.remove('hidden');
-        headerP3Controls.classList.add('flex');
-        stopCarousel();
-        renderPage3ExecutionView();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-
-      // Close open dropdown and search popovers on navigation
+      updateStepperDisplay(pageId);
       closeNavDropdown();
       closeSearchDropdown();
+
+      // Configure Header & Adaptive Theme Styles
+      const osBadge = document.getElementById('headerOsBadgeContainer');
+      const backBtn = document.getElementById('headerBackBtn');
+      const backBtnText = document.getElementById('headerBackBtnText');
+      const stepper = document.getElementById('workflowStepperContainer');
+
+      applyThemeForPage(pageId);
+
+      if (pageId === 'page1') {
+        stopCarousel();
+        startCarousel();
+        osBadge.classList.add('hidden');
+        backBtn.classList.add('hidden');
+        stepper.classList.add('hidden');
+      } else if (pageId === 'page2') {
+        stopCarousel();
+        osBadge.classList.remove('hidden');
+        osBadge.classList.add('inline-flex');
+        backBtn.classList.remove('hidden');
+        backBtnText.textContent = 'Back';
+        stepper.classList.remove('hidden');
+        renderHeaderOS();
+        renderPage2State();
+      } else if (pageId === 'page3') {
+        stopCarousel();
+        osBadge.classList.remove('hidden');
+        osBadge.classList.add('inline-flex');
+        backBtn.classList.remove('hidden');
+        backBtnText.textContent = 'Back to App';
+        stepper.classList.remove('hidden');
+        renderHeaderOS();
+        renderPage3State();
+      } else if (pageId === 'page4') {
+        stopCarousel();
+        osBadge.classList.remove('hidden');
+        osBadge.classList.add('inline-flex');
+        backBtn.classList.remove('hidden');
+        backBtnText.textContent = 'Back to Report';
+        stepper.classList.remove('hidden');
+        renderHeaderOS();
+        renderPage4Recovery();
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // --- TOP NAV DROPDOWN LOGIC ---
+    // Adaptive Theme (Light style for all pages including Page 4)
+    function applyThemeForPage(pageId) {
+      const body = document.getElementById('appBody');
+      const topNav = document.getElementById('topNavBar');
+      const mainHeader = document.getElementById('mainAppHeader');
+      const brandTitle = document.getElementById('headerBrandTitle');
+      const brandSub = document.getElementById('headerBrandSubtitle');
+      const footer = document.getElementById('appFooter');
+      const ambient = document.getElementById('ambientAuraContainer');
+
+      // Clean white and green aesthetic across the entire app
+      body.className = 'min-h-screen bg-[#f8fafc] text-slate-900 font-sans relative selection:bg-emerald-100 selection:text-emerald-900 flex flex-col justify-between overflow-x-hidden transition-colors duration-300';
+      topNav.className = 'w-full border-b border-slate-200/70 bg-white/95 backdrop-blur-md sticky top-0 z-40 text-xs text-slate-600 transition-colors duration-200';
+      mainHeader.className = 'w-full border-b border-slate-200/80 bg-white/70 backdrop-blur-md sticky top-9 z-30 transition-colors duration-200';
+      brandTitle.className = 'font-bold text-base tracking-tight text-slate-900';
+      brandSub.className = 'hidden sm:inline-block text-[11px] font-medium text-slate-400 border-l border-slate-200 pl-2';
+      footer.className = 'w-full py-6 text-center text-xs text-slate-400 select-none';
+      if (ambient) ambient.classList.remove('opacity-30');
+    }
+
+    function handleHeaderBack() {
+      if (state.activePage === 'page4') {
+        navigateTo('page3');
+      } else if (state.activePage === 'page3') {
+        navigateTo('page2');
+      } else if (state.activePage === 'page2') {
+        navigateTo('page1');
+      }
+    }
+
+    // --- STEPPER PROGRESS COMPONENT ---
+    function updateStepperDisplay(pageId) {
+      const s1Num = document.getElementById('stepperStep1Num');
+      const s1Label = document.getElementById('stepperStep1Label');
+      const s2Num = document.getElementById('stepperStep2Num');
+      const s2Label = document.getElementById('stepperStep2Label');
+      const s3Num = document.getElementById('stepperStep3Num');
+      const s3Label = document.getElementById('stepperStep3Label');
+      const s4Num = document.getElementById('stepperStep4Num');
+      const s4Label = document.getElementById('stepperStep4Label');
+
+      // Reset
+      [s1Num, s2Num, s3Num, s4Num].forEach((num, idx) => {
+        num.className = 'w-5 h-5 rounded-full flex items-center justify-center font-mono text-[11px] font-bold border border-slate-200 bg-slate-100 text-slate-500';
+        num.textContent = (idx + 1).toString();
+      });
+      [s1Label, s2Label, s3Label, s4Label].forEach(lbl => {
+        lbl.className = 'text-slate-400 font-medium';
+      });
+
+      if (pageId === 'page2') {
+        s1Num.className = 'w-5 h-5 rounded-full flex items-center justify-center font-mono text-[11px] font-bold border border-emerald-500 bg-emerald-500 text-white';
+        s1Label.className = 'text-slate-900 font-bold';
+      } else if (pageId === 'page3') {
+        s1Num.className = 'w-5 h-5 rounded-full flex items-center justify-center font-mono text-[11px] font-bold border border-emerald-600 bg-emerald-100 text-emerald-800';
+        s1Num.textContent = '✓';
+        s1Label.className = 'text-emerald-800 font-medium';
+
+        s2Num.className = 'w-5 h-5 rounded-full flex items-center justify-center font-mono text-[11px] font-bold border border-emerald-500 bg-emerald-500 text-white';
+        s2Label.className = 'text-slate-900 font-bold';
+      } else if (pageId === 'page4') {
+        s1Num.className = 'w-5 h-5 rounded-full flex items-center justify-center font-mono text-[11px] font-bold border border-emerald-600 bg-emerald-950 text-emerald-400';
+        s1Num.textContent = '✓';
+        s1Label.className = 'text-emerald-400 font-medium';
+
+        s2Num.className = 'w-5 h-5 rounded-full flex items-center justify-center font-mono text-[11px] font-bold border border-emerald-600 bg-emerald-950 text-emerald-400';
+        s2Num.textContent = '✓';
+        s2Label.className = 'text-emerald-400 font-medium';
+
+        s3Num.className = 'w-5 h-5 rounded-full flex items-center justify-center font-mono text-[11px] font-bold border border-cyan-500 bg-cyan-950 text-cyan-300';
+        s3Num.textContent = '✓';
+        s3Label.className = 'text-cyan-300 font-medium';
+
+        s4Num.className = 'w-5 h-5 rounded-full flex items-center justify-center font-mono text-[11px] font-bold border border-emerald-400 bg-emerald-500 text-slate-950';
+        s4Label.className = 'text-emerald-300 font-bold';
+      }
+    }
+
+    // --- CAROUSEL (PAGE 1) ---
+    function startCarousel() {
+      stopCarousel();
+      const textEl = document.getElementById('carouselText');
+      if (!textEl) return;
+
+      carouselInterval = setInterval(() => {
+        textEl.classList.add('-translate-y-3', 'opacity-0');
+        setTimeout(() => {
+          carouselIdx = (carouselIdx + 1) % CAROUSEL_MESSAGES.length;
+          textEl.textContent = CAROUSEL_MESSAGES[carouselIdx];
+          textEl.classList.remove('-translate-y-3');
+          textEl.classList.add('translate-y-3');
+          setTimeout(() => {
+            textEl.classList.remove('translate-y-3', 'opacity-0');
+          }, 50);
+        }, 250);
+      }, 2900);
+    }
+
+    function stopCarousel() {
+      if (carouselInterval) {
+        clearInterval(carouselInterval);
+        carouselInterval = null;
+      }
+    }
+
+    function renderHeaderOS() {
+      const el = document.getElementById('headerOsDisplay');
+      if (el) {
+        el.innerHTML = `${SVG_APPLE} <span>${state.selectedOS}</span>`;
+      }
+    }
+
+    // --- TOP NAV DROPDOWN ---
     function toggleNavDropdown(e) {
       if (e) e.stopPropagation();
       const menu = document.getElementById('topNavDropdownMenu');
@@ -958,30 +1267,28 @@
       const badge1 = document.getElementById('badgePage1');
       const badge2 = document.getElementById('badgePage2');
       const badge3 = document.getElementById('badgePage3');
+      const badge4 = document.getElementById('badgePage4');
 
-      if (badge1) badge1.classList.add('hidden');
-      if (badge2) badge2.classList.add('hidden');
-      if (badge3) badge3.classList.add('hidden');
+      [badge1, badge2, badge3, badge4].forEach(b => {
+        if (b) b.classList.add('hidden');
+      });
 
       if (pageId === 'page1') {
         if (label) label.textContent = 'Home';
         if (badge1) badge1.classList.remove('hidden');
       } else if (pageId === 'page2') {
-        if (label) label.textContent = 'Report an Issue';
+        if (label) label.textContent = 'Select App';
         if (badge2) badge2.classList.remove('hidden');
       } else if (pageId === 'page3') {
-        if (label) label.textContent = 'Diagnostics';
+        if (label) label.textContent = 'Describe Problem';
         if (badge3) badge3.classList.remove('hidden');
+      } else if (pageId === 'page4') {
+        if (label) label.textContent = 'Recovery Center';
+        if (badge4) badge4.classList.remove('hidden');
       }
     }
 
-    // --- SEARCH LOGIC (INDEX & QUERY ENGINE) ---
-    function focusSearchInput() {
-      const input = document.getElementById('topSearchInput');
-      input.focus();
-      handleSearchFocus();
-    }
-
+    // --- SEARCH LOGIC ---
     function handleSearchFocus() {
       closeNavDropdown();
       const query = document.getElementById('topSearchInput').value.trim();
@@ -1021,103 +1328,76 @@
       }
     }
 
-    // Aggregate all real available content across Crash Sight (Zero fake data)
     function getSearchableIndex() {
       const items = [
         {
-          category: 'Page',
-          title: 'Home',
-          detail: 'Welcome screen and introductory overview',
+          category: 'Workflow',
+          title: 'Welcome Screen',
+          detail: 'Step 1: Introduction and introductory overview',
           targetPage: 'page1',
-          keywords: 'home welcome start crash sight about'
+          keywords: 'home welcome start crash sight'
         },
         {
-          category: 'Page',
-          title: 'Report an Incident',
-          detail: 'Incident details, platform context, and evidence dropzone',
+          category: 'Workflow',
+          title: 'Select Application',
+          detail: 'Step 2: Choose which application is freezing or crashing',
           targetPage: 'page2',
-          keywords: 'report issue application form evidence upload attachments'
+          keywords: 'select application app choose picker vlc chrome vs code'
         },
         {
-          category: 'Page',
-          title: 'Incident Diagnostic Engine',
-          detail: 'Execution telemetry, AI triage, and repair sandbox',
+          category: 'Workflow',
+          title: 'Describe Problem & Evidence',
+          detail: 'Step 3: Provide description, symptoms, and attach logs or media',
           targetPage: 'page3',
-          keywords: 'diagnostics execution pipeline telemetry report root cause analysis terminal'
+          keywords: 'describe problem issue upload screenshots video logs'
+        },
+        {
+          category: 'Workflow',
+          title: 'Diagnosis & Recovery Center',
+          detail: 'Step 4: Targeted recovery checklist, verified fixes, and activity logs',
+          targetPage: 'page4',
+          keywords: 'recovery diagnosis center checklist steps cache restart task manager'
         }
       ];
 
-      // Current Application Input
       if (state.appName) {
         items.push({
-          category: 'Application Target',
+          category: 'Target App',
           title: state.appName,
-          detail: `Configured for ${state.selectedOS}`,
+          detail: `Selected for incident triage on ${state.selectedOS}`,
           targetPage: 'page2',
           keywords: `${state.appName} ${state.selectedOS}`
         });
       }
 
-      // Current Issue Description
+      if (state.selectedSymptom) {
+        items.push({
+          category: 'Symptom',
+          title: state.selectedSymptom,
+          detail: `Identified error symptom for ${state.appName || 'application'}`,
+          targetPage: 'page3',
+          keywords: `${state.selectedSymptom} symptom`
+        });
+      }
+
       if (state.description) {
         items.push({
-          category: 'Incident Description',
-          title: 'Reported Issue Text',
-          detail: state.description.length > 65 ? state.description.substring(0, 65) + '…' : state.description,
-          targetPage: 'page2',
+          category: 'Reported Issue',
+          title: 'User Issue Text',
+          detail: state.description.length > 60 ? state.description.substring(0, 60) + '…' : state.description,
+          targetPage: 'page3',
           keywords: state.description
         });
       }
 
-      // Attached Evidence Files
       if (state.files && state.files.length > 0) {
         state.files.forEach(f => {
           items.push({
-            category: 'Evidence Attachment',
+            category: 'Evidence File',
             title: f.name,
             detail: `Attached evidence file (${(f.size / 1024).toFixed(0)} KB)`,
-            targetPage: 'page2',
-            keywords: `${f.name} attachment log video screenshot file`
-          });
-        });
-      }
-
-      // Diagnostic Results & Telemetry if generated
-      if (state.diagnosticData) {
-        items.push({
-          category: 'Primary Diagnosis',
-          title: state.diagnosticData.primary_diagnosis.error_class,
-          detail: state.diagnosticData.probable_root_cause,
-          targetPage: 'page3',
-          keywords: `sigsegv null pointer dereference bad access ${state.diagnosticData.primary_diagnosis.error_class} error fault`
-        });
-
-        items.push({
-          category: 'Remediation',
-          title: state.diagnosticData.recommended_mitigation.action_name,
-          detail: state.diagnosticData.recommended_mitigation.safe_command,
-          targetPage: 'page3',
-          keywords: `remediation command fix repair cache safe ${state.diagnosticData.recommended_mitigation.safe_command}`
-        });
-
-        items.push({
-          category: 'Subsystem',
-          title: 'GPU / Video Blit Pipeline',
-          detail: 'Fault subsystem: libsystem_kernel.dylib -> thread_suspend()',
-          targetPage: 'page3',
-          keywords: 'gpu video blit surface libsystem kernel thread suspend'
-        });
-      }
-
-      // Terminal execution telemetry logs
-      if (state.terminalLogs && state.terminalLogs.length > 0) {
-        state.terminalLogs.forEach(log => {
-          items.push({
-            category: 'Diagnostic Telemetry',
-            title: `Log: [${log.time}]`,
-            detail: log.text,
             targetPage: 'page3',
-            keywords: `${log.text} log telemetry`
+            keywords: `${f.name} attachment log video screenshot file`
           });
         });
       }
@@ -1137,7 +1417,7 @@
         countLabel.textContent = `${allItems.length} available items`;
 
         list.innerHTML = `
-          <div class="px-2 py-1 text-[10px] text-slate-400">Quick Navigation & Context:</div>
+          <div class="px-2 py-1 text-[10px] text-slate-400">Quick Workflow Navigation:</div>
           ${allItems.slice(0, 5).map((item) => `
             <div
               onclick="handleSearchResultClick('${item.targetPage}')"
@@ -1173,7 +1453,6 @@
             <svg class="w-6 h-6 mx-auto text-slate-300 mb-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              <line x1="8" y1="11" x2="14" y2="11"></line>
             </svg>
             <div class="text-xs font-semibold text-slate-700">No results found</div>
             <p class="text-[11px] text-slate-400 mt-0.5 max-w-[210px] mx-auto">
@@ -1219,112 +1498,192 @@
       return escapeHtml(text).replace(regex, '<mark class="bg-emerald-100 text-emerald-900 rounded px-0.5">$1</mark>');
     }
 
-    // --- THEME ADAPTATION FOR TOP NAVIGATION BAR ---
-    function updateThemeForPage(pageId) {
-      const topNav = document.getElementById('topNavBar');
-      const mainHeader = document.getElementById('mainAppHeader');
-      const dropdownBtn = document.getElementById('topNavDropdownBtn');
-      const dropdownMenu = document.getElementById('topNavDropdownMenu');
-      const searchInput = document.getElementById('topSearchInput');
-      const searchToggleBtn = document.getElementById('searchToggleBtn');
-      const searchResults = document.getElementById('searchResultsDropdown');
-      const searchResultsHeader = document.getElementById('searchResultsHeader');
+    // --- PAGE 2: APPLICATION SELECTION LOGIC ---
+    let p2SearchFilter = '';
 
-      if (pageId === 'page3') {
-        topNav.className = 'w-full border-b border-slate-800 bg-[#070b14]/95 backdrop-blur-md sticky top-0 z-40 text-xs text-slate-300 transition-colors duration-200';
-        mainHeader.className = 'w-full border-b border-slate-800 bg-[#0a0f1d]/90 backdrop-blur-md sticky top-9 z-30 transition-colors duration-200';
-        
-        dropdownBtn.className = 'inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-slate-200 hover:text-white bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-cyan-500/30';
-        dropdownMenu.className = 'hidden absolute left-0 mt-1.5 w-52 rounded-xl bg-[#0d1524] border border-slate-800 shadow-2xl py-1 z-50 text-xs text-slate-200';
-        
-        searchInput.className = 'w-44 sm:w-60 pl-8 pr-7 py-1 rounded-full text-xs text-slate-100 placeholder-slate-500 bg-[#050811] border border-slate-800 focus:outline-none focus:border-cyan-500 focus:bg-[#080d1a] focus:ring-1 focus:ring-cyan-500/30 transition-all';
-        searchToggleBtn.className = 'p-1 rounded-md text-slate-400 hover:text-cyan-300 hover:bg-slate-800 transition-colors cursor-pointer';
-        searchResults.className = 'hidden absolute right-0 mt-1.5 w-72 sm:w-80 rounded-xl bg-[#0d1524] border border-slate-800 shadow-2xl p-2 z-50 text-xs text-slate-200 max-h-80 overflow-y-auto';
-        if (searchResultsHeader) searchResultsHeader.className = 'px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400 border-b border-slate-800 flex justify-between items-center mb-1';
+    function renderPage2State() {
+      const grid = document.getElementById('p2AppGrid');
+      const summaryCard = document.getElementById('p2SelectedSummaryCard');
+      const searchInput = document.getElementById('p2AppSearchInput');
+
+      const query = (p2SearchFilter || (searchInput ? searchInput.value : '')).trim().toLowerCase();
+      const filtered = query
+        ? COMMON_APPS.filter(app => app.name.toLowerCase().includes(query) || app.category.toLowerCase().includes(query))
+        : COMMON_APPS;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-6 text-center rounded-xl bg-red-50/70 border border-red-200">
+            <p class="text-sm font-bold text-red-600">No results found</p>
+            <p class="text-xs text-red-500 mt-1 font-medium">Only VLC Media Player, VS Code, OBS Studio, Discord, or Blinkit can be selected.</p>
+          </div>
+        `;
       } else {
-        topNav.className = 'w-full border-b border-slate-200/70 bg-white/95 backdrop-blur-md sticky top-0 z-40 text-xs text-slate-600 transition-colors duration-200';
-        mainHeader.className = 'w-full border-b border-slate-200/80 bg-white/70 backdrop-blur-md sticky top-9 z-30 transition-colors duration-200';
-        
-        dropdownBtn.className = 'inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-slate-700 hover:text-slate-900 bg-slate-100/80 hover:bg-slate-200/80 border border-slate-200/80 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/30';
-        dropdownMenu.className = 'hidden absolute left-0 mt-1.5 w-52 rounded-xl bg-white border border-slate-200 shadow-xl py-1 z-50 text-xs text-slate-700';
-        
-        searchInput.className = 'w-44 sm:w-60 pl-8 pr-7 py-1 rounded-full text-xs text-slate-800 placeholder-slate-400 bg-slate-100 border border-slate-200 focus:outline-none focus:border-emerald-500 focus:bg-white focus:ring-1 focus:ring-emerald-500/20 transition-all';
-        searchToggleBtn.className = 'p-1 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer';
-        searchResults.className = 'hidden absolute right-0 mt-1.5 w-72 sm:w-80 rounded-xl bg-white border border-slate-200 shadow-xl p-2 z-50 text-xs text-slate-800 max-h-80 overflow-y-auto';
-        if (searchResultsHeader) searchResultsHeader.className = 'px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400 border-b border-slate-100 flex justify-between items-center mb-1';
+        grid.innerHTML = filtered.map(app => {
+          const isSelected = state.appName.toLowerCase() === app.name.toLowerCase();
+          const borderClass = isSelected
+            ? 'border-emerald-500 bg-emerald-50/70 ring-2 ring-emerald-500/20'
+            : 'border-slate-200 bg-slate-50/70 hover:bg-white hover:border-slate-300';
+
+          return `
+            <button
+              type="button"
+              onclick="selectAppFromDirectory('${escapeHtml(app.name)}', '${app.icon}')"
+              class="p-2.5 rounded-xl border ${borderClass} flex items-center space-x-2 text-left transition-all cursor-pointer group"
+            >
+              <span class="text-base">${app.icon}</span>
+              <div class="truncate">
+                <div class="text-xs font-semibold text-slate-800 group-hover:text-emerald-700 truncate">${escapeHtml(app.name)}</div>
+                <div class="text-[10px] text-slate-400 truncate">${app.category}</div>
+              </div>
+            </button>
+          `;
+        }).join('');
+      }
+
+      if (state.appName) {
+        summaryCard.classList.remove('hidden');
+        document.getElementById('p2SelectedName').textContent = state.appName;
+        document.getElementById('p2SelectedIcon').textContent = state.appIcon || '💻';
+      } else {
+        summaryCard.classList.add('hidden');
       }
     }
 
-    // --- FORM SYNC HELPERS ---
-    function handleAppNameChange(val) {
-      state.appName = val.trim();
-      clearError('appNameError');
+    function handleAppInput(val) {
+      p2SearchFilter = val.trim();
+      clearError('p2AppError');
+
+      // Check if entered input exactly matches one of the 5 apps
+      const exactMatch = COMMON_APPS.find(a => a.name.toLowerCase() === p2SearchFilter.toLowerCase());
+      if (exactMatch) {
+        state.appName = exactMatch.name;
+        state.appIcon = exactMatch.icon;
+      } else {
+        if (state.appName && state.appName.toLowerCase() !== p2SearchFilter.toLowerCase()) {
+          state.appName = '';
+        }
+      }
+
+      renderPage2State();
+    }
+
+    function selectAppFromDirectory(appName, appIcon) {
+      state.appName = appName;
+      state.appIcon = appIcon || '💻';
+      clearError('p2AppError');
+      renderPage2State();
+    }
+
+    function clearSelectedApp() {
+      state.appName = '';
+      state.appIcon = '💻';
+      p2SearchFilter = '';
+      const input = document.getElementById('p2AppSearchInput');
+      if (input) input.value = '';
+      renderPage2State();
+      if (input) input.focus();
+    }
+
+    function handlePage2Continue() {
+      const matchedApp = COMMON_APPS.find(a => a.name.toLowerCase() === state.appName.trim().toLowerCase());
+      if (!matchedApp) {
+        showError('p2AppError', 'Please select one of the 5 allowed applications: VLC Media Player, VS Code, OBS Studio, Discord, or Blinkit.');
+        return;
+      }
+      state.appName = matchedApp.name;
+      state.appIcon = matchedApp.icon;
+      clearError('p2AppError');
+      navigateTo('page3');
+    }
+
+    // --- PAGE 3: DESCRIBE THE PROBLEM LOGIC ---
+    function renderPage3State() {
+      document.getElementById('p3AppNameBadge').textContent = state.appName || 'Application';
+      document.getElementById('p3AppIconBadge').textContent = state.appIcon || '💻';
+
+      // Preserve description input
+      const descInput = document.getElementById('p3DescriptionInput');
+      if (descInput && state.description) {
+        descInput.value = state.description;
+      }
+
+      // Render Symptom Chips
+      const chipsContainer = document.getElementById('symptomChipsContainer');
+      chipsContainer.innerHTML = SYMPTOM_OPTIONS.map(opt => {
+        const isSelected = state.selectedSymptom === opt.label;
+        const activeClass = isSelected
+          ? 'border-emerald-500 bg-emerald-50 text-emerald-800 font-semibold shadow-xs ring-1 ring-emerald-500/30'
+          : 'border-slate-200 bg-slate-50/80 text-slate-700 hover:bg-slate-100/90';
+
+        return `
+          <button
+            type="button"
+            onclick="toggleSymptomOption('${escapeHtml(opt.label)}')"
+            class="p-2 rounded-xl border text-xs flex flex-col items-center justify-center text-center transition-all cursor-pointer ${activeClass}"
+          >
+            <span class="text-sm mb-1">${opt.icon}</span>
+            <span class="text-[11px] leading-tight">${escapeHtml(opt.label)}</span>
+          </button>
+        `;
+      }).join('');
+
+      renderEvidencePreview();
+    }
+
+    function selectInferenceEngine(engine) {
+      state.inferenceEngine = engine;
+      const gemmaBtn = document.getElementById('engineGemmaBtn');
+      const cloudBtn = document.getElementById('engineCloudBtn');
+      const badgeGemma = document.getElementById('badgeEngineGemma');
+      const badgeCloud = document.getElementById('badgeEngineCloud');
+      const p4EngineBadge = document.getElementById('p4EngineBadgeText');
+
+      if (engine === 'gemma') {
+        gemmaBtn.className = 'p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50/70 text-left transition-all cursor-pointer flex items-start space-x-3 group shadow-xs';
+        cloudBtn.className = 'p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white hover:border-slate-300 text-left transition-all cursor-pointer flex items-start space-x-3 group';
+        if (badgeGemma) badgeGemma.classList.remove('hidden');
+        if (badgeCloud) badgeCloud.classList.add('hidden');
+        if (p4EngineBadge) p4EngineBadge.textContent = 'Gemma 4 Triage Engine';
+      } else {
+        cloudBtn.className = 'p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50/70 text-left transition-all cursor-pointer flex items-start space-x-3 group shadow-xs';
+        gemmaBtn.className = 'p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white hover:border-slate-300 text-left transition-all cursor-pointer flex items-start space-x-3 group';
+        if (badgeCloud) badgeCloud.classList.remove('hidden');
+        if (badgeGemma) badgeGemma.classList.add('hidden');
+        if (p4EngineBadge) p4EngineBadge.textContent = 'Cloud API Triage Endpoint';
+      }
+    }
+
+    function toggleSymptomOption(symptomLabel) {
+      if (state.selectedSymptom === symptomLabel) {
+        state.selectedSymptom = '';
+      } else {
+        state.selectedSymptom = symptomLabel;
+      }
+      renderPage3State();
     }
 
     function handleDescriptionChange(val) {
       state.description = val.trim();
-      clearError('descriptionError');
+      clearError('p3DescriptionError');
     }
 
-    // Global click listener for dropdown & search dismissal
-    document.addEventListener('click', (e) => {
-      const dropdownContainer = document.getElementById('topNavDropdownContainer');
-      const searchContainer = document.getElementById('topSearchContainer');
-
-      if (dropdownContainer && !dropdownContainer.contains(e.target)) {
-        closeNavDropdown();
-      }
-      if (searchContainer && !searchContainer.contains(e.target)) {
-        closeSearchDropdown();
-      }
-    });
-
-    // --- PAGE 1 CAROUSEL ---
-    function startCarousel() {
-      if (carouselInterval) clearInterval(carouselInterval);
-      const textEl = document.getElementById('carouselText');
-      if (!textEl) return;
-
-      carouselInterval = setInterval(() => {
-        textEl.classList.add('-translate-y-3', 'opacity-0');
-        setTimeout(() => {
-          carouselIdx = (carouselIdx + 1) % CAROUSEL_MESSAGES.length;
-          textEl.textContent = CAROUSEL_MESSAGES[carouselIdx];
-          textEl.classList.remove('-translate-y-3');
-          textEl.classList.add('translate-y-3');
-          setTimeout(() => {
-            textEl.classList.remove('translate-y-3', 'opacity-0');
-          }, 50);
-        }, 250);
-      }, 2900);
-    }
-
-    function stopCarousel() {
-      if (carouselInterval) clearInterval(carouselInterval);
-    }
-
-    function renderHeaderOS() {
-      const el = document.getElementById('headerOsDisplay');
-      el.innerHTML = `${SVG_APPLE} <span>macOS</span>`;
-    }
-
-    // --- EVIDENCE FILE UPLOADER ---
     function handleDragOver(e) {
       e.preventDefault();
       e.stopPropagation();
-      const dropzone = document.getElementById('dropzone');
-      const aura = document.getElementById('dropzoneAura');
-      dropzone.classList.add('border-emerald-500', 'bg-emerald-50/90');
-      aura.classList.add('opacity-90');
+      const dropzone = document.getElementById('p3Dropzone');
+      const aura = document.getElementById('p3DropzoneAura');
+      if (dropzone) dropzone.classList.add('border-emerald-500', 'bg-emerald-50/90');
+      if (aura) aura.classList.add('opacity-90');
     }
 
     function handleDragLeave(e) {
       e.preventDefault();
       e.stopPropagation();
-      const dropzone = document.getElementById('dropzone');
-      const aura = document.getElementById('dropzoneAura');
-      dropzone.classList.remove('border-emerald-500', 'bg-emerald-50/90');
-      aura.classList.remove('opacity-90');
+      const dropzone = document.getElementById('p3Dropzone');
+      const aura = document.getElementById('p3DropzoneAura');
+      if (dropzone) dropzone.classList.remove('border-emerald-500', 'bg-emerald-50/90');
+      if (aura) aura.classList.remove('opacity-90');
     }
 
     function handleDrop(e) {
@@ -1347,7 +1706,7 @@
       const allowedExt = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'mp4', 'mov', 'webm', 'log', 'txt', 'json'];
 
       if (state.files.length + fileList.length > maxCount) {
-        showError('filesError', `Maximum ${maxCount} files allowed. You already attached ${state.files.length}.`);
+        showError('p3FilesError', `Maximum ${maxCount} files allowed. You already attached ${state.files.length}.`);
         return;
       }
 
@@ -1355,12 +1714,12 @@
         const ext = file.name.split('.').pop().toLowerCase();
 
         if (file.size > maxSizeBytes) {
-          showError('filesError', `File "${file.name}" exceeds 25 MB limit.`);
+          showError('p3FilesError', `File "${file.name}" exceeds 25 MB limit.`);
           return;
         }
 
         if (!allowedExt.includes(ext) && !file.type.startsWith('image/') && !file.type.startsWith('video/')) {
-          showError('filesError', `Format .${ext} is not supported. Use images, videos, or logs.`);
+          showError('p3FilesError', `Format .${ext} is not supported. Use images, videos, or logs.`);
           return;
         }
 
@@ -1376,7 +1735,7 @@
         });
       });
 
-      clearError('filesError');
+      clearError('p3FilesError');
       renderEvidencePreview();
     }
 
@@ -1392,9 +1751,11 @@
     }
 
     function renderEvidencePreview() {
-      const container = document.getElementById('evidencePreviewSection');
-      const grid = document.getElementById('evidenceGrid');
-      const countLabel = document.getElementById('evidenceCountLabel');
+      const container = document.getElementById('p3EvidencePreviewSection');
+      const grid = document.getElementById('p3EvidenceGrid');
+      const countLabel = document.getElementById('p3EvidenceCountLabel');
+
+      if (!container || !grid) return;
 
       if (state.files.length === 0) {
         container.classList.add('hidden');
@@ -1411,7 +1772,7 @@
         if (file.previewUrl && file.type.startsWith('video/')) {
           previewHtml = `<video src="${file.previewUrl}" class="w-full h-full object-cover" muted></video>`;
         } else if (file.previewUrl) {
-          previewHtml = `<img src="${file.previewUrl}" alt="${file.name}" class="w-full h-full object-cover" />`;
+          previewHtml = `<img src="${file.previewUrl}" alt="${escapeHtml(file.name)}" class="w-full h-full object-cover" />`;
         } else {
           previewHtml = `<span class="font-mono text-[10px] text-slate-500 font-semibold uppercase">.LOG/.TXT</span>`;
         }
@@ -1421,7 +1782,7 @@
             <div class="w-full h-14 rounded bg-slate-200 overflow-hidden mb-1 flex items-center justify-center">
               ${previewHtml}
             </div>
-            <div class="truncate font-medium text-slate-700" title="${file.name}">${file.name}</div>
+            <div class="truncate font-medium text-slate-700" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</div>
             <div class="text-[10px] text-slate-400">${sizeKb} KB</div>
             <button
               type="button"
@@ -1438,7 +1799,435 @@
       }).join('');
     }
 
-    // --- FORM VALIDATION & SUBMISSION -> PAGE 3 ---
+    function handlePage3Submit(e) {
+      if (e) e.preventDefault();
+      const descVal = document.getElementById('p3DescriptionInput').value.trim();
+
+      if (!descVal) {
+        showError('p3DescriptionError', 'Please describe the problem you are experiencing before proceeding.');
+        return;
+      }
+
+      state.description = descVal;
+      clearError('p3DescriptionError');
+      navigateTo('page4');
+    }
+
+    // --- PAGE 4: DIAGNOSIS & APPLICATION RECOVERY LOGIC ---
+    function renderPage4Recovery() {
+      const app = state.appName || 'VS Code';
+      const desc = state.description || 'Editor input latency and freezing during file editing.';
+      const symptom = state.selectedSymptom || 'Application is slow';
+
+      const appData = getApplicationTriageData(app, desc, symptom);
+
+      document.getElementById('p4AppBadge').textContent = app;
+      document.getElementById('p4WorkaroundRootCause').textContent = `Root Cause: ${appData.rootCause}`;
+      document.getElementById('p4WorkaroundCmd').textContent = appData.workaroundCmd;
+      document.getElementById('p4GemmaReportPre').textContent = appData.bugReport;
+
+      // Reset outcome views
+      document.getElementById('p4SolvedOutcome').classList.add('hidden');
+      document.getElementById('p4BrokenOutcome').classList.add('hidden');
+      document.getElementById('p4DispatchedTargetCard').classList.add('hidden');
+
+      // Reset button styles
+      const btnSolved = document.getElementById('p4BtnSolved');
+      const btnBroken = document.getElementById('p4BtnBroken');
+      if (btnSolved) btnSolved.className = 'inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-xs transition-all cursor-pointer';
+      if (btnBroken) btnBroken.className = 'inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 shadow-xs transition-all cursor-pointer';
+
+      // Reset Report Issue button
+      const reportIssueBtn = document.getElementById('p4ReportIssueBtn');
+      if (reportIssueBtn) {
+        reportIssueBtn.disabled = false;
+        reportIssueBtn.innerHTML = '<span>🚨</span><span>Report Issue</span>';
+        reportIssueBtn.className = 'inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-xs shadow-emerald-600/20 active:scale-95 transition-all cursor-pointer flex-shrink-0';
+      }
+
+      // Reset Self Heal button and status
+      const selfHealBtn = document.getElementById('p4SelfHealBtn');
+      if (selfHealBtn) {
+        selfHealBtn.disabled = false;
+        selfHealBtn.innerHTML = `
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+          </svg>
+          <span>Self Heal</span>
+        `;
+        selfHealBtn.className = 'inline-flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-xs shadow-emerald-600/20 active:scale-95 transition-all cursor-pointer flex-shrink-0';
+      }
+      const selfHealStatus = document.getElementById('p4SelfHealStatus');
+      if (selfHealStatus) selfHealStatus.classList.add('hidden');
+
+      state.currentAppData = appData;
+      state.selectedEscalationChannel = null;
+    }
+
+    function getApplicationTriageData(app, userDesc, symptom) {
+      const lower = app.toLowerCase();
+
+      if (lower.includes('vs code') || lower.includes('vscode')) {
+        return {
+          appName: 'VS Code',
+          rootCause: 'Extension Host process event-loop starvation or Language Server Protocol (LSP) memory exhaustion causing typing latency and editor input thread stalls.',
+          workaroundCmd: 'code --disable-extensions',
+          bugReport: `### Issue Summary\n**Component:** Extension Host / Language Server Protocol (LSP)\n**Symptom:** Editor input responsiveness failure, high typing latency, and stalled completion providers.\n\n### Technical Description\nUser reports inability to write code due to editor latency or freeze. In the VS Code architecture, direct text buffer edits occur on the Renderer process, but synchronous decorations, keybindings intercepted by extension host providers, and heavy IPC traffic to active LSP servers (e.g., \`tsserver\`, \`pylance\`, or rust-analyzer) can starve the UI thread or overwhelm the shared memory/IPC channels.\n\n### User Reported Context\n"${userDesc}"`,
+          github: {
+            name: 'VS Code GitHub Issue Tracker',
+            url: 'https://github.com/microsoft/vscode/issues'
+          },
+          official: {
+            name: 'VS Code Official Support Desk',
+            url: 'https://code.visualstudio.com/docs/supporting/troubleshoot'
+          }
+        };
+      } else if (lower.includes('discord')) {
+        return {
+          appName: 'Discord',
+          rootCause: 'Corrupted local client audio cache and stale ICE state stored in LevelDB/Chromium cache causing silent RTC socket handshake drops (RTC_CONNECTING state timeout).',
+          workaroundCmd: 'pkill -f Discord && rm -rf ~/.config/discord/Cache ~/.config/discord/Code\\ Cache ~/.config/discord/GPUCache',
+          bugReport: `# Bug Report: WebRTC Voice Socket Drop and Connection Hang\n\n## Overview\nUsers experience a failure to connect to voice channels or transmit/receive audio streams. The client UI repeatedly displays 'RTC Connecting' or fails silently after voice socket initiation.\n\n## Reproduction Steps\n1. Launch Discord Electron Client.\n2. Attempt to join any voice channel or direct call.\n3. Observe voice connection status hanging on 'RTC Connecting' followed by an abrupt silent drop or 'No Route' state.\n\n### User Reported Context\n"${userDesc}"`,
+          github: {
+            name: 'Discord API Community Tracker',
+            url: 'https://github.com/discord/discord-api-docs/issues'
+          },
+          official: {
+            name: 'Discord Official Help Center',
+            url: 'https://support.discord.com/hc/en-us/requests/new'
+          }
+        };
+      } else if (lower.includes('vlc')) {
+        return {
+          appName: 'VLC Media Player',
+          rootCause: 'Hardware-accelerated decoding pipeline deadlock or corrupted font/shader cache preventing frame surface presentation.',
+          workaroundCmd: 'vlc --no-embedded-video --no-hw-dec',
+          bugReport: `### Issue Summary\n**Component:** Video Output / Hardware Acceleration Pipeline\n**Symptom:** Playback window black screen, audio-only playback, or complete application crash on container seek.\n\n### Technical Description\nDirect hardware decoding fails to blit uncompressed surfaces to display server buffers, resulting in thread deadlock on presentation.\n\n### User Reported Context\n"${userDesc}"`,
+          github: {
+            name: 'VideoLAN GitLab / Issue Tracker',
+            url: 'https://code.videolan.org/videolan/vlc/-/issues'
+          },
+          official: {
+            name: 'VideoLAN Official Support Forums',
+            url: 'https://forum.videolan.org/'
+          }
+        };
+      } else if (lower.includes('obs')) {
+        return {
+          appName: 'OBS Studio',
+          rootCause: 'GPU hook encoder contention or incompatible third-party audio capture filter stalling the compositing render loop.',
+          workaroundCmd: 'obs --safe-mode',
+          bugReport: `### Issue Summary\n**Component:** Render Pipeline / Encoder Subsystem\n**Symptom:** Scene preview freeze, high rendering lag (encoder overload), or immediate crash upon starting output.\n\n### Technical Description\nGraphics capture hook encountered an unhandled texture lock, deadlocking OBS render thread and dropping compositing frames.\n\n### User Reported Context\n"${userDesc}"`,
+          github: {
+            name: 'OBS Studio GitHub Issue Tracker',
+            url: 'https://github.com/obsproject/obs-studio/issues'
+          },
+          official: {
+            name: 'OBS Official Support Portal',
+            url: 'https://obsproject.com/forum/'
+          }
+        };
+      } else {
+        // Blinkit or other default
+        return {
+          appName: 'Blinkit',
+          rootCause: 'Local storage session cache corruption or service-worker hydration deadlock causing unresponsive UI states.',
+          workaroundCmd: 'rm -rf ~/Library/Caches/Blinkit && rm -rf ~/Library/Application\\ Support/Blinkit/Cache',
+          bugReport: `### Issue Summary\n**Component:** Client Hydration / Web Wrapper Engine\n**Symptom:** White screen of death on startup or stalled checkout network payload.\n\n### Technical Description\nIndexedDB deserialization failure during startup bootstrap, causing the root layout render loop to throw unhandled exceptions.\n\n### User Reported Context\n"${userDesc}"`,
+          github: {
+            name: 'Blinkit Technical Issue Portal',
+            url: 'https://blinkit.com/contact'
+          },
+          official: {
+            name: 'Blinkit Customer & Technical Support Desk',
+            url: 'https://blinkit.com/contact'
+          }
+        };
+      }
+    }
+
+    function copyWorkaroundCommand(btn) {
+      const code = document.getElementById('p4WorkaroundCmd').textContent;
+      copyTextToClipboard(code);
+      btn.textContent = '✓ Copied';
+      setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+    }
+
+    function copyGemmaReport(btn) {
+      const text = document.getElementById('p4GemmaReportPre').textContent;
+      copyTextToClipboard(text);
+      const label = document.getElementById('p4CopyReportLabel');
+      label.textContent = '✓ Report Copied!';
+      setTimeout(() => { label.textContent = 'Copy Report'; }, 2000);
+    }
+
+    function handleSelfHealClick() {
+      const btn = document.getElementById('p4SelfHealBtn');
+      const statusBox = document.getElementById('p4SelfHealStatus');
+      if (!btn || btn.disabled) return;
+
+      btn.disabled = true;
+      btn.innerHTML = `
+        <svg class="animate-spin h-3.5 w-3.5 text-white" viewBox="0 0 24 24" fill="none">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>Healing...</span>
+      `;
+
+      setTimeout(() => {
+        btn.innerHTML = `
+          <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Self-Healed</span>
+        `;
+        btn.className = 'inline-flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-700 text-white shadow-xs cursor-default flex-shrink-0';
+
+        if (statusBox) {
+          const app = state.appName || 'Application';
+          statusBox.innerHTML = `
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center space-x-2 font-medium">
+                <span class="text-emerald-600 font-bold">✓</span>
+                <span>Self-heal patch deployed for <strong>${escapeHtml(app)}</strong>. Offending cache and stale thread states have been isolated.</span>
+              </div>
+              <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 flex-shrink-0">Auto-Remediated</span>
+            </div>
+          `;
+          statusBox.classList.remove('hidden');
+        }
+      }, 1000);
+    }
+
+    function copyTextToClipboard(str) {
+      const tempArea = document.createElement('textarea');
+      tempArea.value = str;
+      tempArea.setAttribute('readonly', '');
+      tempArea.style.position = 'fixed';
+      tempArea.style.left = '-9999px';
+      document.body.appendChild(tempArea);
+      tempArea.select();
+      try {
+        document.execCommand('copy');
+      } catch (err) {
+        console.error('Clipboard copy error', err);
+      } finally {
+        document.body.removeChild(tempArea);
+      }
+    }
+
+    function handleWorkaroundResult(isSolved) {
+      const solvedDiv = document.getElementById('p4SolvedOutcome');
+      const brokenDiv = document.getElementById('p4BrokenOutcome');
+      const btnSolved = document.getElementById('p4BtnSolved');
+      const btnBroken = document.getElementById('p4BtnBroken');
+
+      if (isSolved) {
+        solvedDiv.classList.remove('hidden');
+        brokenDiv.classList.add('hidden');
+
+        // Button active styles
+        btnSolved.className = 'inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-emerald-700 text-white shadow-sm ring-2 ring-emerald-500/30 transition-all cursor-pointer';
+        btnBroken.className = 'inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-slate-50 hover:bg-slate-100 text-slate-500 border border-slate-200 transition-all cursor-pointer';
+
+        solvedDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else {
+        solvedDiv.classList.add('hidden');
+        brokenDiv.classList.remove('hidden');
+
+        // Button active styles
+        btnBroken.className = 'inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-rose-600 text-white shadow-sm ring-2 ring-rose-500/30 border-rose-600 transition-all cursor-pointer';
+        btnSolved.className = 'inline-flex items-center space-x-1.5 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-slate-50 hover:bg-slate-100 text-slate-500 border border-slate-200 transition-all cursor-pointer';
+
+        // Auto-select GitHub as default escalation target
+        selectEscalationChannel('github');
+
+        brokenDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    function handleReportIssueClick() {
+      // Auto-copy the Gemma bug report for quick dispatch
+      const reportText = document.getElementById('p4GemmaReportPre').textContent;
+      copyTextToClipboard(reportText);
+
+      const channel = state.selectedEscalationChannel || 'github';
+      selectEscalationChannel(channel);
+
+      const btn = document.getElementById('p4ReportIssueBtn');
+      if (!btn || btn.disabled) return;
+
+      btn.disabled = true;
+      btn.innerHTML = `
+        <svg class="animate-spin h-3.5 w-3.5 text-white" viewBox="0 0 24 24" fill="none">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>Dispatching...</span>
+      `;
+
+      setTimeout(() => {
+        btn.innerHTML = `
+          <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Dispatched</span>
+        `;
+        btn.className = 'inline-flex items-center space-x-1.5 px-5 py-2.5 rounded-xl text-xs font-semibold bg-emerald-700 text-white shadow-xs cursor-default flex-shrink-0';
+
+        const targetCard = document.getElementById('p4DispatchedTargetCard');
+        if (targetCard) {
+          targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }, 900);
+    }
+
+    function selectEscalationChannel(channel) {
+      const githubBtn = document.getElementById('p4EscalateGithubBtn');
+      const officialBtn = document.getElementById('p4EscalateOfficialBtn');
+      const targetCard = document.getElementById('p4DispatchedTargetCard');
+      const targetName = document.getElementById('p4DispatchedTargetName');
+      const targetUrl = document.getElementById('p4DispatchedTargetUrl');
+
+      state.selectedEscalationChannel = channel;
+      const data = state.currentAppData;
+
+      githubBtn.className = 'p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center space-x-2.5 text-xs font-semibold text-slate-800 transition-all cursor-pointer';
+      officialBtn.className = 'p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 flex items-center space-x-2.5 text-xs font-semibold text-slate-800 transition-all cursor-pointer';
+
+      if (channel === 'github') {
+        githubBtn.className = 'p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50/70 flex items-center space-x-2.5 text-xs font-semibold text-slate-900 shadow-xs transition-all cursor-pointer';
+        targetName.textContent = data.github.name;
+        targetUrl.textContent = data.github.url;
+        targetUrl.href = data.github.url;
+      } else {
+        officialBtn.className = 'p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-50/70 flex items-center space-x-2.5 text-xs font-semibold text-slate-900 shadow-xs transition-all cursor-pointer';
+        targetName.textContent = data.official.name;
+        targetUrl.textContent = data.official.url;
+        targetUrl.href = data.official.url;
+      }
+
+      targetCard.classList.remove('hidden');
+      targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function finishSession() {
+      showToastModal('Session Completed', 'Thank you for using Crash Sight. Your troubleshooting session has been marked complete.');
+      navigateTo('page1');
+    }
+
+    function promptResetSession() {
+      const modal = document.getElementById('appToastModal');
+      const title = document.getElementById('appToastTitle');
+      const msg = document.getElementById('appToastMsg');
+      const actions = document.getElementById('modalActionButtons');
+
+      title.textContent = 'Start New Session?';
+      msg.textContent = 'Are you sure you want to start a new troubleshooting session? This will clear your current progress and return you to application selection.';
+      
+      actions.innerHTML = `
+        <button
+          type="button"
+          onclick="closeToastModal()"
+          class="flex-1 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-semibold cursor-pointer transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          onclick="confirmResetSession()"
+          class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold cursor-pointer transition-colors"
+        >
+          Confirm
+        </button>
+      `;
+
+      modal.classList.remove('hidden');
+    }
+
+    function confirmResetSession() {
+      closeToastModal();
+      state.appName = '';
+      state.selectedSymptom = '';
+      state.description = '';
+      state.files = [];
+      state.recoverySteps = [];
+      state.activityLogs = [];
+      state.verificationChoice = null;
+      navigateTo('page2');
+    }
+
+    function showToastModal(title, msg) {
+      document.getElementById('appToastTitle').textContent = title;
+      document.getElementById('appToastMsg').textContent = msg;
+      document.getElementById('modalActionButtons').innerHTML = `
+        <button
+          type="button"
+          onclick="closeToastModal()"
+          class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold cursor-pointer transition-colors"
+        >
+          Got it
+        </button>
+      `;
+      document.getElementById('appToastModal').classList.remove('hidden');
+    }
+
+    function closeToastModal() {
+      document.getElementById('appToastModal').classList.add('hidden');
+    }
+
+    function copySessionSummary(btnEl) {
+      const summaryText = `[Crash Sight Recovery Summary]
+Application: ${state.appName || 'Not provided'}
+OS: ${state.selectedOS}
+Symptom: ${state.selectedSymptom || state.symptomType}
+User Description: ${state.description}
+Attached Files: ${state.files.length}
+Steps Attempted: ${state.recoverySteps.map(s => `${s.title}: ${s.status}`).join('; ')}
+Outcome: ${state.verificationChoice || 'In progress'}`;
+
+      const tempArea = document.createElement('textarea');
+      tempArea.value = summaryText;
+      tempArea.setAttribute('readonly', '');
+      tempArea.style.position = 'fixed';
+      tempArea.style.left = '-9999px';
+      document.body.appendChild(tempArea);
+      tempArea.select();
+      try {
+        document.execCommand('copy');
+        const orig = btnEl.textContent;
+        btnEl.textContent = '✓ Summary Copied!';
+        setTimeout(() => { btnEl.textContent = orig; }, 2000);
+      } catch (err) {
+        console.error('Copy failed', err);
+      } finally {
+        document.body.removeChild(tempArea);
+      }
+    }
+
+    // --- ACTIVITY LOG HELPER ---
+    function logActivity(text) {
+      state.activityLogs.push({ time: getLocalTimestamp(), text });
+      renderActivityLog();
+    }
+
+    function renderActivityLog() {
+      const container = document.getElementById('p4ActivityLogList');
+      if (!container) return;
+
+      container.innerHTML = state.activityLogs.map(log => `
+        <div class="flex items-start space-x-2 text-slate-700">
+          <span class="text-slate-400 select-none">[${log.time}]</span>
+          <span>${escapeHtml(log.text)}</span>
+        </div>
+      `).join('');
+    }
+
+    function getLocalTimestamp() {
+      return new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
     function showError(elementId, message) {
       const el = document.getElementById(elementId);
       if (el) {
@@ -1455,284 +2244,25 @@
       }
     }
 
-    function handleSendReport(e) {
-      if (e) e.preventDefault();
-      if (state.isSubmitting) return;
+    // Dismiss popovers on outside click
+    document.addEventListener('click', (e) => {
+      const dropdownContainer = document.getElementById('topNavDropdownContainer');
+      const searchContainer = document.getElementById('topSearchContainer');
 
-      const appNameVal = document.getElementById('appNameInput').value.trim();
-      const descVal = document.getElementById('descriptionInput').value.trim();
-
-      let hasError = false;
-      if (!appNameVal) {
-        showError('appNameError', 'Application name is required.');
-        hasError = true;
+      if (dropdownContainer && !dropdownContainer.contains(e.target)) {
+        closeNavDropdown();
       }
-      if (!descVal) {
-        showError('descriptionError', 'Please describe what happened.');
-        hasError = true;
+      if (searchContainer && !searchContainer.contains(e.target)) {
+        closeSearchDropdown();
       }
-
-      if (hasError) return;
-
-      state.appName = appNameVal;
-      state.description = descVal;
-      state.incidentId = 'CS-' + Math.floor(100000 + Math.random() * 900000);
-      state.sessionId = 'RUN-' + Math.floor(Date.now() / 1000).toString(16).toUpperCase();
-      state.isSubmitting = true;
-
-      // Loading state on button
-      const sendIcon = document.getElementById('sendBtnIcon');
-      const sendSpinner = document.getElementById('sendBtnSpinner');
-      const sendBtn = document.getElementById('sendBtn');
-      sendIcon.classList.add('hidden');
-      sendSpinner.classList.remove('hidden');
-      sendBtn.disabled = true;
-
-      // Initialize logs for Page 3
-      const now = () => new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      state.terminalLogs = [
-        { time: now(), text: `Incident payload received for [${state.appName}].`, level: 'info' },
-        { time: now(), text: `Operating System: macOS`, level: 'dim' },
-        { time: now(), text: `Evidence package contains ${state.files.length} attached items.`, level: 'info' },
-        { time: now(), text: 'Transitioning to isolated execution pipeline...', level: 'info' }
-      ];
-
-      // Smooth transition to Page 3 after brief delay
-      setTimeout(() => {
-        sendIcon.classList.remove('hidden');
-        sendSpinner.classList.add('hidden');
-        sendBtn.disabled = false;
-        state.isSubmitting = false;
-
-        // Navigate to dedicated Page 3
-        navigateTo('page3');
-      }, 450);
-    }
-
-    // --- PAGE 3: EXECUTION & DIAGNOSTICS LOGIC ---
-    function renderPage3ExecutionView() {
-      // Header details
-      document.getElementById('page3HeaderOsDisplay').innerHTML = `${SVG_APPLE} <span>macOS · ${state.appName}</span>`;
-
-      document.getElementById('p3IncidentBadge').textContent = state.incidentId;
-      document.getElementById('p3TargetAppTitle').textContent = state.appName;
-      document.getElementById('p3HostOsTitle').textContent = state.selectedOS;
-      document.getElementById('p3SessionId').textContent = state.sessionId;
-
-      // User recap section
-      document.getElementById('p3RecapApp').textContent = state.appName;
-      document.getElementById('p3RecapDescription').textContent = `"${state.description}"`;
-
-      // Evidence preview chips
-      const chipsEl = document.getElementById('p3EvidenceChips');
-      if (state.files.length === 0) {
-        chipsEl.innerHTML = '<span class="text-slate-400 italic">No attachments uploaded (Optional).</span>';
-      } else {
-        chipsEl.innerHTML = state.files.map(f => `
-          <div class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md bg-white border border-slate-200 text-[11px] text-slate-700 font-medium">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-            <span class="truncate max-w-[140px]">${f.name}</span>
-            <span class="text-slate-400">(${(f.size / 1024).toFixed(0)} KB)</span>
-          </div>
-        `).join('');
-      }
-
-      // Host Environment Card
-      document.getElementById('p3EnvOs').textContent = 'macOS';
-      document.getElementById('p3EnvEvidence').textContent = `${state.files.length} items attached`;
-
-      // Simulated Stack Trace Evidence
-      document.getElementById('p3StackEvidence').textContent = 
-`Thread 0 Crashed:: Dispatch queue: com.apple.main-thread
-0   libsystem_kernel.dylib         0x00007ff819c4d2fe thread_suspend + 10
-1   com.apple.CoreGraphics         0x00007ff81c3b1a20 blit_surface_unaccelerated + 288
-2   ${(state.appName || 'application').toLowerCase().replace(/\s+/g, '_')}_render             0x00000001004a2f01 frame_buffer_flush + 64
-3   libdispatch.dylib              0x00007ff819ab2341 _dispatch_client_callout + 8
-Exception Type: EXC_BAD_ACCESS (SIGSEGV)
-Exception Codes: KERN_INVALID_ADDRESS at 0x0000000000000028`;
-
-      // Remediation command
-      const safeCmd = `defaults write com.videolan.${(state.appName || 'app').toLowerCase()} HardwareAcceleration -bool false && rm -rf ~/Library/Caches/${(state.appName || 'app').toLowerCase()}`;
-      document.getElementById('p3RemediationCommand').textContent = safeCmd;
-
-      // Diagnostic structured data
-      state.diagnosticData = {
-        incident_id: state.incidentId,
-        session_id: state.sessionId,
-        timestamp: new Date().toISOString(),
-        host: {
-          platform: 'macOS',
-          target_application: state.appName
-        },
-        analysis_status: 'Completed (Sandbox Demo Engine)',
-        gemma_connection: 'Offline / Demo Emulation Only',
-        primary_diagnosis: {
-          error_class: 'Null Pointer Dereference (SIGSEGV)',
-          confidence_score: 0.942,
-          severity: 'High - Immediate Crash',
-          fault_location: 'libsystem_kernel.dylib -> thread_suspend()'
-        },
-        probable_root_cause: `The host rendering pipeline encountered an invalid memory address while attempting to blit an unaccelerated video frame buffer into hardware surface for ${state.appName}.`,
-        user_context: {
-          submitted_description: state.description,
-          evidence_count: state.files.length
-        },
-        recommended_mitigation: {
-          action_name: 'Safe Cache Invalidation & Hardware Acceleration Toggle',
-          safe_command: safeCmd,
-          safe_to_execute: false,
-          requires_user_approval: true
-        }
-      };
-      document.getElementById('p3JsonOutput').textContent = JSON.stringify(state.diagnosticData, null, 2);
-
-      // Trigger staged execution telemetry & progress
-      runStagedAnalysis();
-    }
-
-    function runStagedAnalysis() {
-      const now = () => new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-      const statusText = document.getElementById('p3StatusText');
-      const statusDetail = document.getElementById('p3StatusDetail');
-      const statusPill = document.getElementById('p3StatusPillIndicator');
-      const stageLabel = document.getElementById('p3ProgressStageLabel');
-      const progressPercent = document.getElementById('p3ProgressPercent');
-      const progressBar = document.getElementById('p3ProgressBar');
-
-      // Stage 1
-      statusText.textContent = 'Preparing Analysis...';
-      statusText.className = 'text-xs font-bold font-mono text-cyan-600 bg-cyan-50 border border-cyan-200 px-2 py-0.5 rounded';
-      statusDetail.textContent = 'Allocating sandboxed evaluation container...';
-      statusPill.className = 'w-3 h-3 rounded-full bg-cyan-400 animate-ping';
-      stageLabel.textContent = 'Stage 1 of 3: Allocating sandbox container';
-      progressPercent.textContent = '25%';
-      progressBar.style.width = '25%';
-      renderP3Logs();
-
-      setTimeout(() => {
-        state.terminalLogs.push({ time: now(), text: 'Local telemetry triage engine initializing (Demo Sandbox)...', level: 'info' });
-        statusText.textContent = 'Analyzing Telemetry...';
-        statusText.className = 'text-xs font-bold font-mono text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded';
-        statusDetail.textContent = 'Parsing memory frames against known crash patterns...';
-        statusPill.className = 'w-3 h-3 rounded-full bg-amber-400 animate-ping';
-        stageLabel.textContent = 'Stage 2 of 3: Memory fault isolation';
-        progressPercent.textContent = '65%';
-        progressBar.style.width = '65%';
-        renderP3Logs();
-      }, 500);
-
-      setTimeout(() => {
-        state.terminalLogs.push(
-          { time: now(), text: 'Synthesized crash pattern matched: EXC_BAD_ACCESS / SIGSEGV memory fault.', level: 'warn' },
-          { time: now(), text: 'Diagnostics isolated: Root cause identified with 94.2% confidence.', level: 'success' }
-        );
-        statusText.textContent = 'Analysis Completed';
-        statusText.className = 'text-xs font-bold font-mono text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded';
-        statusDetail.textContent = 'Root cause identified with high confidence. Remediation synthesized.';
-        statusPill.className = 'w-3 h-3 rounded-full bg-emerald-500';
-        stageLabel.textContent = 'Stage 3 of 3: Diagnostic triage completed';
-        progressPercent.textContent = '100%';
-        progressBar.style.width = '100%';
-        renderP3Logs();
-      }, 1100);
-    }
-
-    function renderP3Logs() {
-      const container = document.getElementById('p3TerminalLogOutput');
-      if (!container) return;
-
-      container.innerHTML = state.terminalLogs.map(log => {
-        let col = 'text-cyan-300';
-        if (log.level === 'success') col = 'text-emerald-400 font-medium';
-        if (log.level === 'warn') col = 'text-amber-300';
-        if (log.level === 'dim') col = 'text-slate-400';
-
-        return `
-          <div class="flex items-start space-x-2">
-            <span class="text-slate-500 select-none">[${log.time}]</span>
-            <span class="${col}">${log.text}</span>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function restartAnalysis() {
-      const now = () => new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      state.terminalLogs = [
-        { time: now(), text: `Re-initiating diagnostic triage for [${state.appName}]...`, level: 'info' }
-      ];
-      runStagedAnalysis();
-    }
-
-    // --- CLIPBOARD ACTIONS ---
-    function copyTextToClipboard(text, buttonEl, successText = 'Copied') {
-      const tempArea = document.createElement('textarea');
-      tempArea.value = text;
-      tempArea.setAttribute('readonly', '');
-      tempArea.style.position = 'fixed';
-      tempArea.style.left = '-9999px';
-      document.body.appendChild(tempArea);
-      tempArea.select();
-      
-      try {
-        document.execCommand('copy');
-        const origText = buttonEl.textContent;
-        buttonEl.textContent = successText;
-        setTimeout(() => {
-          buttonEl.textContent = origText;
-        }, 2000);
-      } catch (err) {
-        console.error('Copy fallback failed', err);
-      } finally {
-        document.body.removeChild(tempArea);
-      }
-    }
-
-    function copyP3Json() {
-      if (!state.diagnosticData) return;
-      const btn = document.getElementById('p3CopyJsonBtn');
-      copyTextToClipboard(JSON.stringify(state.diagnosticData, null, 2), btn, '✓ Copied');
-    }
-
-    function copyP3Command() {
-      if (!state.diagnosticData) return;
-      const btn = document.getElementById('p3CopyCmdBtn');
-      copyTextToClipboard(state.diagnosticData.recommended_mitigation.safe_command, btn, 'Copied');
-    }
-
-    // --- REPAIR SIMULATION ACTION ---
-    function handleP3SimulateAction() {
-      if (state.simulatedState !== 'idle') return;
-
-      const btn = document.getElementById('p3SimulateBtn');
-      const btnText = document.getElementById('p3SimulateBtnText');
-
-      state.simulatedState = 'executing';
-      btn.className = 'inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs font-semibold bg-slate-700 text-slate-300 cursor-wait';
-      btnText.innerHTML = '<span class="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin mr-1.5 inline-block"></span> Simulating in Sandbox...';
-
-      setTimeout(() => {
-        state.simulatedState = 'done';
-        btn.className = 'inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs font-semibold bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 cursor-default';
-        btnText.textContent = '✓ Simulation Complete (Safe)';
-
-        const now = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        state.terminalLogs.push({
-          time: now,
-          text: 'Simulated sandbox test verified: No destructive file deletion requested.',
-          level: 'success'
-        });
-        renderP3Logs();
-      }, 900);
-    }
+    });
 
     // Initialize application on load
     window.onload = function() {
       startCarousel();
       renderHeaderOS();
       updateDropdownActiveState('page1');
-      updateThemeForPage('page1');
+      renderPage2State();
     };
   </script>
 </body>
