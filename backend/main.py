@@ -1,11 +1,15 @@
-from fastapi import FastAPI, Form, UploadFile, File
+from fastapi import FastAPI, Form, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import os
 import uvicorn
 
-app = FastAPI()
+# Import your custom Agents and Schemas
+from gemma_agent import analyze_crash, APP_CONFIGS
+from github_agent import dispatch_issue
+from schemas import DispatchRequest
 
-# CRITICAL: This allows your HTML file to communicate with the Python server
+app = FastAPI(title="CrashSight API", version="1.0")
+
+# CRITICAL: Allow the frontend (running on a different port/file) to talk to this backend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,44 +19,53 @@ app.add_middleware(
 )
 
 @app.post("/api/analyze")
-async def analyze_crash(
+async def api_analyze_crash(
     app_name: str = Form(...),
     app_type: str = Form(...),
     description: str = Form(...),
-    # Accepts files but we don't strict-validate to prevent demo crashes
-    files: list[UploadFile] = File(None) 
+    files: list[UploadFile] = File(default=[])
 ):
     """
-    Simulates Gemma-4 e4b processing. 
-    In a real scenario, you'd pass the description/images to the Google GenAI SDK here.
+    Endpoint 1: Receives the screenshot and text from the UI, passes it to Agent Skill 1 (Gemma 4).
     """
-    # Generating dynamic safe commands based on OS/App
-    safe_cmd = f"rm -rf ~/Library/Caches/{app_name.lower().replace(' ', '')}"
-    
-    return {
-        "status": "success",
-        "primary_diagnosis": {
-            "error_class": f"Unhandled Exception in {app_name}",
-            "confidence_score": "96.4%",
-            "severity": "High",
-            "fault_location": "Core pipeline thread fault"
-        },
-        "probable_root_cause": f"Gemma 4 Analysis: The description '{description}' indicates a memory fault or cache corruption within the {app_type} environment of {app_name}.",
-        "recommended_mitigation": {
-            "safe_command": safe_cmd
-        }
-    }
+    try:
+        # Pass the inputs to your Gemma triage engine
+        result = analyze_crash(app_name, app_type, description, files)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Gemma Engine Error: {str(e)}")
 
 @app.post("/api/dispatch")
-async def fake_agent_dispatch():
+async def api_dispatch_issue(request: DispatchRequest):
     """
-    Fake Agent Skill to satisfy the mid-evaluation requirement.
+    Endpoint 2: Receives the finalized report and triggers Agent Skill 2 (GitHub API).
     """
-    return {
-        "status": "success", 
-        "message": "Done!", 
-        "github_url": "https://github.com/mock-repo/issues/1"
-    }
+    # 1. Route to the correct SaaS client repository using the dictionary
+    app_key = request.app_name.lower().replace(" ", "")
+    config = APP_CONFIGS.get(app_key)
+    
+    if not config:
+        # Fallback to your own repository if they test a random app name not in the dictionary
+        repo_owner = "your_github_username"  # <-- CHANGE THIS TO YOUR USERNAME
+        repo_name = "CrashSight"             # <-- CHANGE THIS TO YOUR REPO
+    else:
+        repo_owner = config["github_owner"]
+        repo_name = config["github_repo"]
+
+    title = f"[CrashSight Automated Report] Incident in {request.app_name}"
+    
+    # 2. Trigger the GitHub Agent
+    response = dispatch_issue(
+        repo_owner=repo_owner,
+        repo_name=repo_name,
+        title=title,
+        body=request.report_markdown
+    )
+
+    if response["status"] == "success":
+        return response
+    else:
+        raise HTTPException(status_code=500, detail=response["message"])
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
