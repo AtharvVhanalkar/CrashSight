@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crash Sight — Application Incident & Troubleshooting</title>
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Aura Wave Animations & Custom Styling -->
+  <style>
+    /* Continuous asynchronous aura waves */
+    @keyframes auraDrift1 {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.35; }
+      50% { transform: translate(3.5%, 3%) scale(1.08); opacity: 0.75; }
+    }
+    @keyframes auraDrift2 {
+      0%, 100% { transform: translate(0, 0) scale(1.05); opacity: 0.28; }
+      50% { transform: translate(-3.5%, -2.5%) scale(0.95); opacity: 0.65; }
+    }
+    @keyframes auraWaveDrift {
+      0% { transform: translateX(0) scaleY(1); }
+      50% { transform: translateX(-5%) scaleY(1.10); }
+      100% { transform: translateX(0) scaleY(1); }
+    }
+
+    .aura-layer-1 {
+      animation: auraDrift1 14s ease-in-out infinite;
+    }
+    .aura-layer-2 {
+      animation: auraDrift2 19s ease-in-out infinite;
+    }
+    .aura-layer-wave {
+      animation: auraWaveDrift 16s ease-in-out infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .aura-layer-1, .aura-layer-2, .aura-layer-wave {
+        animation: none !important;
+        transform: none !important;
+      }
+    }
+
+    /* Custom scrollbars for terminal & code blocks */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(100, 116, 139, 0.4);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(100, 116, 139, 0.7);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#f8fafc] text-slate-900 font-sans relative selection:bg-emerald-100 selection:text-emerald-900 flex flex-col justify-between overflow-x-hidden">
+
+  <!-- ==================================================== -->
+  <!-- GLOBAL AMBIENT BACKGROUND AURA (SVG Fluid Geometry)  -->
+  <!-- ==================================================== -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
+    <!-- Top ambient glow -->
+    <div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[400px] bg-gradient-to-b from-sky-100/40 via-emerald-50/20 to-transparent blur-3xl opacity-70"></div>
+    <!-- Bottom fluid waves -->
+    <svg class="absolute bottom-0 left-0 w-full h-[320px] md:h-[420px] opacity-75 text-sky-100" viewBox="0 0 1440 400" fill="none" preserveAspectRatio="none">
+      <path d="M0 240C240 180 480 300 720 220C960 140 1200 240 1440 190V400H0V240Z" fill="url(#aura-grad-1)" />
+      <path d="M0 290C320 210 640 330 960 260C1280 190 1360 240 1440 230V400H0V290Z" fill="url(#aura-grad-2)" />
+      <defs>
+        <linearGradient id="aura-grad-1" x1="0" y1="0" x2="1440" y2="400" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#e0f2fe" stopOpacity="0.45" />
+          <stop offset="0.5" stopColor="#bae6fd" stopOpacity="0.30" />
+          <stop offset="1" stopColor="#ccfbf1" stopOpacity="0.40" />
+        </linearGradient>
+        <linearGradient id="aura-grad-2" x1="1440" y1="200" x2="0" y2="400" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#dbeafe" stopOpacity="0.5" />
+          <stop offset="0.5" stopColor="#e0f2fe" stopOpacity="0.35" />
+          <stop offset="1" stopColor="#f0fdf4" stopOpacity="0.6" />
+        </linearGradient>
+      </defs>
+    </svg>
+  </div>
+
+  <!-- Main Content Wrapper -->
+  <div class="relative z-10 flex-1 flex flex-col justify-between">
+    
+    <!-- ==================================================== -->
+    <!-- TOP HEADER BAR                                       -->
+    <!-- ==================================================== -->
+    <header class="w-full border-b border-slate-200/80 bg-white/70 backdrop-blur-md sticky top-0 z-30">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+        <!-- Brand Identity -->
+        <div class="flex items-center space-x-2.5 select-none cursor-pointer" onclick="navigateTo('page1')">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 shadow-sm">
+            <svg class="w-5 h-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              <path d="m9 12 2 2 4-4" stroke="#10b981" stroke-width="2.5" />
+              <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+            </svg>
+          </div>
+          <div class="flex items-baseline space-x-2">
+            <span class="font-bold text-base tracking-tight text-slate-900">Crash Sight</span>
+            <span class="hidden sm:inline-block text-[11px] font-medium text-slate-400 border-l border-slate-200 pl-2">
+              Application Incident & Troubleshooting
+            </span>
+          </div>
+        </div>
+
+        <!-- Page 2 Specific Header Controls -->
+        <div id="page2HeaderControls" class="hidden flex items-center space-x-2">
+          <!-- OS Selector Pill with Switch Action -->
+          <div class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200/80 text-xs font-medium text-slate-700">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span id="headerOsDisplay" class="flex items-center space-x-1">
+              <!-- Dynamically populated via JS -->
+            </span>
+            <button
+              type="button"
+              onclick="toggleOS()"
+              class="ml-1 text-[10px] text-slate-400 hover:text-slate-800 underline cursor-pointer transition-colors"
+              title="Switch platform"
+            >
+              switch
+            </button>
+          </div>
+
+          <!-- Back Navigation -->
+          <button
+            type="button"
+            onclick="navigateTo('page1')"
+            class="inline-flex items-center text-xs font-semibold text-slate-600 hover:text-slate-900 px-2.5 py-1 rounded-md hover:bg-slate-100 transition-colors cursor-pointer"
+          >
+            <svg class="w-3.5 h-3.5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>Back</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ==================================================== -->
+    <!-- PAGE 1: WELCOME SCREEN                               -->
+    <!-- ==================================================== -->
+    <main id="page1" class="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 py-12 text-center max-w-2xl mx-auto my-auto transition-all duration-300">
+      <!-- 1. Hero Logo -->
+      <div class="flex flex-col items-center mb-6">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-b from-white to-slate-50 border border-slate-200 shadow-md shadow-slate-200/50 flex items-center justify-center mb-4 transition-transform hover:scale-105">
+          <svg class="w-8 h-8 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            <path d="m9 12 2 2 4-4" stroke="#10b981" stroke-width="2.5" />
+            <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+          </svg>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+          Crash Sight
+        </h1>
+        <p class="mt-1 text-xs font-semibold tracking-wider text-slate-400 uppercase">
+          Application Incident & Troubleshooting
+        </p>
+      </div>
+
+      <!-- 2. Animated Information Section (Fixed height prevents layout shift) -->
+      <div class="w-full h-16 flex items-center justify-center overflow-hidden mb-8 px-2" aria-live="polite">
+        <p id="carouselText" class="text-base sm:text-lg text-slate-600 font-normal leading-snug transition-all duration-300 ease-out transform">
+          Report software crashes without the hassle.
+        </p>
+      </div>
+
+      <!-- 3. Continue Button with Flowing Blue Aura Waves -->
+      <div class="relative inline-flex group">
+        <!-- Blue Aura Wave Behind Button -->
+        <div class="absolute -inset-2.5 pointer-events-none overflow-hidden rounded-full z-0 select-none opacity-45 group-hover:opacity-85 group-hover:scale-105 transition-all duration-300">
+          <div class="absolute -inset-[25%] aura-layer-1" style="background: radial-gradient(ellipse at 50% 50%, rgba(37,131,255,0.50) 0%, rgba(117,221,255,0.38) 45%, rgba(221,245,255,0.45) 75%, transparent 90%); filter: blur(10px);"></div>
+          <div class="absolute -inset-[30%] aura-layer-2" style="background: radial-gradient(ellipse at 70% 60%, rgba(117,221,255,0.32) 0%, rgba(37,131,255,0.22) 50%, rgba(221,245,255,0.4) 75%, transparent 85%); filter: blur(14px);"></div>
+        </div>
+
+        <button
+          type="button"
+          onclick="navigateTo('page2')"
+          class="relative z-10 inline-flex items-center justify-center px-8 py-3 rounded-full text-sm font-semibold text-slate-800 bg-white/95 hover:bg-emerald-600 active:bg-emerald-700 hover:text-white border border-slate-300/80 hover:border-emerald-600 shadow-sm hover:shadow-lg hover:shadow-emerald-600/20 active:scale-95 transition-all duration-250 ease-out focus:outline-none focus:ring-2 focus:ring-emerald-500/40 cursor-pointer"
+        >
+          <span>Continue</span>
+          <svg class="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </div>
+    </main>
+
+    <!-- ==================================================== -->
+    <!-- PAGE 2: INCIDENT REPORTING & DIAGNOSTICS             -->
+    <!-- ==================================================== -->
+    <main id="page2" class="hidden flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-10 transition-all duration-300">
+      <!-- Title -->
+      <div class="mb-6">
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          Report an incident
+        </h1>
+        <p class="mt-1 text-sm text-slate-500">
+          Tell us which app failed and what happened. Evidence is optional but helps.
+        </p>
+      </div>
+
+      <!-- Main Reporting Card -->
+      <form id="incidentForm" onsubmit="handleSendReport(event)" class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-5 sm:p-7 space-y-7">
+        
+        <!-- SECTION 1: APPLICATION CONTEXT -->
+        <section class="space-y-4">
+          <div class="text-xs font-semibold tracking-wider text-slate-400 uppercase">
+            Application Context
+          </div>
+
+          <!-- Application Name with Soft Blue Aura -->
+          <div>
+            <label for="appNameInput" class="block text-sm font-semibold text-slate-800 mb-1.5">
+              Application Name
+            </label>
+            <div class="relative group rounded-lg">
+              <!-- Element Aura -->
+              <div class="absolute -inset-1 pointer-events-none overflow-hidden rounded-lg z-0 select-none opacity-20 group-hover:opacity-40 group-focus-within:opacity-80 transition-opacity duration-300">
+                <div class="absolute -inset-[20%] aura-layer-1" style="background: radial-gradient(ellipse at 35% 40%, rgba(37,131,255,0.32) 0%, rgba(117,221,255,0.28) 45%, rgba(221,245,255,0.4) 75%, transparent 90%); filter: blur(10px);"></div>
+              </div>
+              <input
+                id="appNameInput"
+                type="text"
+                placeholder="e.g. VLC, Chrome, VS Code"
+                class="relative z-10 w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-sm text-slate-900 placeholder-slate-400 bg-white/95 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                oninput="clearError('appNameError')"
+              />
+            </div>
+            <p id="appNameError" class="hidden mt-1 text-xs text-rose-500 font-medium"></p>
+          </div>
+
+          <!-- Application Type Selector -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-800 mb-1.5">
+              Application Type
+            </label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <!-- Native App Card -->
+              <div
+                id="typeNativeCard"
+                onclick="setAppType('native')"
+                class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-100/70 hover:border-slate-300 cursor-pointer transition-all flex items-center space-x-3"
+              >
+                <div id="typeNativeRadio" class="w-4 h-4 rounded-full border border-slate-300 bg-white flex items-center justify-center transition-all"></div>
+                <div>
+                  <div class="text-sm font-semibold text-slate-800">Native / Built-in App</div>
+                  <div id="typeNativeSub" class="text-xs text-slate-500">Ships with macOS</div>
+                </div>
+              </div>
+
+              <!-- Third-Party App Card -->
+              <div
+                id="typeThirdCard"
+                onclick="setAppType('third-party')"
+                class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-100/70 hover:border-slate-300 cursor-pointer transition-all flex items-center space-x-3"
+              >
+                <div id="typeThirdRadio" class="w-4 h-4 rounded-full border border-slate-300 bg-white flex items-center justify-center transition-all"></div>
+                <div>
+                  <div class="text-sm font-semibold text-slate-800">Third-Party App</div>
+                  <div class="text-xs text-slate-500">Installed separately</div>
+                </div>
+              </div>
+            </div>
+            <p id="appTypeError" class="hidden mt-1 text-xs text-rose-500 font-medium"></p>
+          </div>
+        </section>
+
+        <!-- SECTION 2: ISSUE DESCRIPTION & EVIDENCE (3-COLUMN COMPOSER) -->
+        <section class="space-y-3">
+          <div class="text-xs font-semibold tracking-wider text-slate-400 uppercase">
+            Issue Description & Evidence
+          </div>
+
+          <div class="flex flex-col md:flex-row items-stretch gap-3">
+            <!-- Left: Evidence Dropzone with Cyan/Electric-Blue Aura -->
+            <div class="relative md:w-56 flex-shrink-0 group">
+              <div id="dropzoneAura" class="absolute -inset-1 pointer-events-none overflow-hidden rounded-xl z-0 select-none opacity-30 group-hover:opacity-65 transition-opacity duration-300">
+                <div class="absolute -inset-[25%] aura-layer-1" style="background: radial-gradient(ellipse at 35% 40%, rgba(37,131,255,0.35) 0%, rgba(117,221,255,0.30) 45%, rgba(221,245,255,0.4) 75%, transparent 90%); filter: blur(10px);"></div>
+              </div>
+              <div
+                id="dropzone"
+                onclick="document.getElementById('fileInput').click()"
+                ondragover="handleDragOver(event)"
+                ondragleave="handleDragLeave(event)"
+                ondrop="handleDrop(event)"
+                class="relative z-10 h-full border border-dashed border-slate-200/90 bg-slate-50/80 hover:bg-slate-100/90 hover:border-slate-300 rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer transition-all"
+              >
+                <input
+                  id="fileInput"
+                  type="file"
+                  multiple
+                  accept="image/*,video/*,.log,.txt,.json"
+                  class="hidden"
+                  onchange="handleFileInputChange(event)"
+                />
+                <svg class="w-6 h-6 text-slate-400 group-hover:text-emerald-600 transition-colors mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
+                  <path d="M12 12v9" />
+                  <path d="m16 16-4-4-4 4" />
+                </svg>
+                <span class="text-xs font-semibold text-emerald-700">Add evidence</span>
+                <span class="text-[11px] text-slate-400 mt-1 max-w-[170px] leading-snug">
+                  or drop files · images, video, logs · max 6, 25 MB each
+                </span>
+              </div>
+            </div>
+
+            <!-- Center: Description Textarea with Aura -->
+            <div class="relative flex-1 flex flex-col group">
+              <div class="absolute -inset-1 pointer-events-none overflow-hidden rounded-xl z-0 select-none opacity-25 group-hover:opacity-40 group-focus-within:opacity-75 transition-opacity duration-300">
+                <div class="absolute -inset-[20%] aura-layer-1" style="background: radial-gradient(ellipse at 35% 40%, rgba(37,131,255,0.32) 0%, rgba(117,221,255,0.28) 45%, rgba(221,245,255,0.4) 75%, transparent 90%); filter: blur(10px);"></div>
+              </div>
+              <textarea
+                id="descriptionInput"
+                rows="5"
+                placeholder="Describe the error, what you were doing, and what happened..."
+                class="relative z-10 w-full h-full p-3.5 rounded-xl border border-slate-200 text-sm text-slate-900 placeholder-slate-400 bg-white/95 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none"
+                oninput="clearError('descriptionError')"
+              ></textarea>
+            </div>
+
+            <!-- Right: Send Button with Aura -->
+            <div class="relative flex md:flex-col justify-end items-stretch group">
+              <div class="absolute -inset-1 pointer-events-none overflow-hidden rounded-xl z-0 select-none opacity-40 group-hover:opacity-85 transition-opacity duration-300">
+                <div class="absolute -inset-[25%] aura-layer-1" style="background: radial-gradient(ellipse at 50% 50%, rgba(37,131,255,0.50) 0%, rgba(117,221,255,0.38) 45%, rgba(221,245,255,0.45) 75%, transparent 90%); filter: blur(10px);"></div>
+              </div>
+              <button
+                id="sendBtn"
+                type="submit"
+                class="relative z-10 w-full md:w-14 h-12 md:h-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl flex items-center justify-center shadow-sm shadow-emerald-600/30 hover:shadow-emerald-600/40 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/40 cursor-pointer"
+                title="Send and analyze incident"
+                aria-label="Send Report and Analyze"
+              >
+                <span id="sendBtnIcon">
+                  <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" fill-opacity="0.2"></polygon>
+                  </svg>
+                </span>
+                <span id="sendBtnSpinner" class="hidden">
+                  <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Validation Errors -->
+          <p id="descriptionError" class="hidden text-xs text-rose-500 font-medium"></p>
+          <p id="filesError" class="hidden text-xs text-rose-500 font-medium"></p>
+
+          <!-- Uploaded Evidence Chips -->
+          <div id="evidencePreviewSection" class="hidden pt-2">
+            <div id="evidenceCountLabel" class="text-xs font-semibold text-slate-500 mb-2">Attached Evidence (0/6)</div>
+            <div id="evidenceGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2"></div>
+          </div>
+        </section>
+      </form>
+
+      <!-- Pre-submission Hint -->
+      <div id="preDiagnosticHint" class="mt-6 flex items-center space-x-2 text-xs text-slate-400 px-3 py-2 rounded-lg bg-slate-50/80 border border-slate-200/60">
+        <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
+        <span>Diagnostic results and automated triage telemetry will appear here after you send the report.</span>
+      </div>
+
+      <!-- ==================================================== -->
+      <!-- EXPANDED DIAGNOSTIC ENGINE (REFERENCE 2 AESTHETIC)   -->
+      <!-- ==================================================== -->
+      <div id="diagnosticContainer" class="hidden relative mt-8 group transition-all duration-500">
+        <!-- Deep Electric-Blue Aura Around Panel -->
+        <div class="absolute -inset-2 pointer-events-none overflow-hidden rounded-2xl z-0 select-none opacity-50 group-hover:opacity-75 transition-opacity duration-500">
+          <div class="absolute -inset-[22%] aura-layer-1" style="background: radial-gradient(ellipse at 30% 35%, rgba(37,131,255,0.45) 0%, rgba(117,221,255,0.22) 45%, transparent 75%); filter: blur(12px);"></div>
+          <div class="absolute -inset-[26%] aura-layer-2" style="background: radial-gradient(ellipse at 70% 65%, rgba(117,221,255,0.32) 0%, rgba(37,131,255,0.25) 50%, transparent 80%); filter: blur(15px);"></div>
+        </div>
+
+        <section class="relative z-10 rounded-2xl bg-[#090e17] border border-slate-800 shadow-xl overflow-hidden">
+          
+          <!-- SECTION A: STATUS HEADER -->
+          <div class="border-b border-slate-800 bg-[#0d1524] px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+              <div class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-sm shadow-cyan-400/50 animate-ping"></div>
+              <div>
+                <div class="flex items-center space-x-2">
+                  <h2 class="text-sm font-semibold text-white tracking-wide">Incident Analysis</h2>
+                  <span id="diagnosticIncidentId" class="text-[11px] font-mono text-cyan-300 bg-cyan-950/60 border border-cyan-800 px-2 py-0.5 rounded">CS-729183</span>
+                </div>
+                <p class="text-xs text-slate-400 mt-0.5">
+                  Target: <span id="diagnosticTargetApp" class="text-slate-200 font-medium">VLC</span> · OS: <span id="diagnosticTargetOS" class="text-slate-200">macOS</span>
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-2">
+              <!-- Honest Status Label (Never false Gemma online) -->
+              <div class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-slate-900 border border-slate-700 text-xs font-mono text-slate-300">
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span>Demo Mode (Local Model Offline)</span>
+              </div>
+
+              <button
+                type="button"
+                onclick="handleSendReport(event)"
+                class="px-3 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition-colors cursor-pointer"
+              >
+                Re-Analyze
+              </button>
+            </div>
+          </div>
+
+          <div class="p-5 sm:p-6 space-y-6">
+            
+            <!-- SECTION B: TERMINAL-STYLE EXECUTION TELEMETRY -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center text-xs font-mono text-slate-400">
+                  <svg class="w-3.5 h-3.5 mr-1.5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="4 17 10 11 4 5"></polyline>
+                    <line x1="12" y1="19" x2="20" y2="19"></line>
+                  </svg>
+                  <span>Execution Pipeline Telemetry</span>
+                </div>
+                <span class="text-[11px] font-mono text-emerald-400 bg-emerald-950/50 px-2 py-0.5 rounded border border-emerald-800/50">
+                  Active Triage
+                </span>
+              </div>
+
+              <div class="relative group">
+                <div class="absolute -inset-1 pointer-events-none overflow-hidden rounded-xl z-0 select-none opacity-40 group-hover:opacity-70 transition-opacity duration-300">
+                  <div class="absolute -inset-[20%] aura-layer-1" style="background: radial-gradient(ellipse at 30% 35%, rgba(37,131,255,0.40) 0%, rgba(117,221,255,0.2) 45%, transparent 75%); filter: blur(10px);"></div>
+                </div>
+                <div class="relative z-10 bg-[#050811] rounded-xl border border-slate-800 p-3.5 font-mono text-xs text-slate-300 space-y-1.5 overflow-x-auto shadow-inner">
+                  <div class="text-slate-600 pb-1.5 border-b border-slate-900 flex items-center justify-between text-[11px]">
+                    <span id="terminalSessionId">SESSION ID: #CS-RUN-8A2F</span>
+                    <span>LOCAL AGENT: NONE (BROWSER DEMO)</span>
+                  </div>
+                  <div id="terminalLogOutput" class="space-y-1"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION C: AI REASONING & STRUCTURED SUMMARY -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <!-- Left 2 Cols: Root Cause Diagnosis -->
+              <div class="lg:col-span-2 bg-[#0d1524] rounded-xl border border-slate-800 p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                  <div class="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    Primary Diagnosis
+                  </div>
+                  <span id="diagnosticSeverityBadge" class="px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-rose-950/70 text-rose-300 border border-rose-800/60">
+                    High - Immediate Crash
+                  </span>
+                </div>
+
+                <div>
+                  <h3 id="diagnosticErrorClass" class="text-base font-bold text-slate-100">
+                    Null Pointer Dereference (SIGSEGV)
+                  </h3>
+                  <p id="diagnosticRootCause" class="text-xs text-slate-400 mt-1 leading-relaxed">
+                    The host rendering pipeline encountered an invalid memory address while attempting to blit an unaccelerated video frame buffer into hardware surface.
+                  </p>
+                </div>
+
+                <div class="pt-2 border-t border-slate-800/80 flex flex-wrap items-center gap-4 text-xs">
+                  <div>
+                    <span class="text-slate-500">Confidence: </span>
+                    <span class="font-mono text-emerald-400 font-medium">94.2%</span>
+                  </div>
+                  <div>
+                    <span class="text-slate-500">Subsystem: </span>
+                    <span class="font-mono text-cyan-300 font-medium">GPU / Video Blit</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right 1 Col: Host Environment Details -->
+              <div class="bg-[#0d1524] rounded-xl border border-slate-800 p-4 space-y-2.5 text-xs font-mono">
+                <div class="text-slate-400 font-sans font-semibold uppercase tracking-wider text-[11px]">
+                  Host Environment
+                </div>
+                <div class="space-y-1.5 text-slate-300">
+                  <div class="flex justify-between">
+                    <span class="text-slate-500">OS:</span>
+                    <span id="envOsLabel" class="text-white">macOS</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-500">Package:</span>
+                    <span id="envPkgLabel" class="text-slate-300">Third-Party Binary</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-500">Evidence:</span>
+                    <span id="envEvidenceLabel" class="text-slate-300">0 items</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-500">Model:</span>
+                    <span class="text-amber-400">Simulation</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION D: RAW STRUCTURED DIAGNOSTIC JSON -->
+            <div class="relative">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-mono text-slate-400">Structured Diagnostic Payload (JSON)</span>
+                <button
+                  type="button"
+                  id="copyJsonBtn"
+                  onclick="copyJsonPayload()"
+                  class="text-xs text-cyan-400 hover:text-cyan-300 transition-colors font-mono cursor-pointer"
+                >
+                  Copy JSON
+                </button>
+              </div>
+              <pre id="jsonDiagnosticPre" class="bg-[#050811] rounded-xl border border-slate-800 p-3 text-[11px] font-mono text-emerald-300 overflow-x-auto max-h-48 leading-snug"></pre>
+            </div>
+
+            <!-- SECTION E: HUMAN APPROVAL / REPAIR SAFETY CONTROLS -->
+            <div class="relative group">
+              <div class="absolute -inset-1 pointer-events-none overflow-hidden rounded-xl z-0 select-none opacity-35 group-hover:opacity-60 transition-opacity duration-300">
+                <div class="absolute -inset-[20%] aura-layer-1" style="background: radial-gradient(ellipse at 50% 50%, rgba(37,131,255,0.4) 0%, rgba(117,221,255,0.2) 45%, transparent 75%); filter: blur(10px);"></div>
+              </div>
+              <div class="relative z-10 bg-[#0d1829] border border-cyan-900/40 rounded-xl p-4 sm:p-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                  <div>
+                    <div class="flex items-center text-sm font-semibold text-cyan-200">
+                      <svg class="w-4 h-4 mr-1.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <path d="m9 12 2 2 4-4" />
+                      </svg>
+                      <span>Recommended Remediation (Approval Required)</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-0.5">
+                      Browser cannot automatically execute host commands. Copy or review the safe isolation command below.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    id="simulateBtn"
+                    onclick="handleSimulateAction()"
+                    class="inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm shadow-emerald-500/20 active:scale-98 transition-all cursor-pointer"
+                  >
+                    <span id="simulateBtnText">Approve & Simulate Action</span>
+                  </button>
+                </div>
+
+                <!-- Code Command with Copy Button -->
+                <div class="relative group">
+                  <div class="bg-[#060b14] rounded-lg p-3 font-mono text-xs text-cyan-300 border border-slate-800 pr-20 overflow-x-auto">
+                    <code id="remediationCommandCode"></code>
+                  </div>
+                  <button
+                    type="button"
+                    id="copyCmdBtn"
+                    onclick="copyRemediationCommand()"
+                    class="absolute right-2 top-2 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-sans transition-colors border border-slate-700 cursor-pointer"
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+      </div>
+
+    </main>
+
+    <!-- ==================================================== -->
+    <!-- FOOTER                                               -->
+    <!-- ==================================================== -->
+    <footer class="w-full py-6 text-center text-xs text-slate-400 select-none">
+      Crash Sight · Technical Diagnostics & Incident Isolation
+    </footer>
+  </div>
+
+  <!-- ==================================================== -->
+  <!-- APPLICATION LOGIC (Vanilla JavaScript)               -->
+  <!-- ==================================================== -->
+  <script>
+    // State Store
+    const state = {
+      activePage: 'page1',
+      selectedOS: 'macOS',
+      appName: '',
+      appType: null, // 'native' | 'third-party' | null
+      description: '',
+      files: [],
+      isSubmitting: false,
+      showDiagnostics: false,
+      simulatedState: 'idle', // 'idle' | 'executing' | 'done'
+      diagnosticData: null,
+      terminalLogs: []
+    };
+
+    // Page 1 Carousel Messages
+    const CAROUSEL_MESSAGES = [
+      "Report software crashes without the hassle.",
+      "Attach screenshots, videos, and error logs.",
+      "Understand errors with AI-powered diagnostics.",
+      "Find possible causes and recommended solutions."
+    ];
+    let carouselIdx = 0;
+    let carouselInterval = null;
+
+    // Brand OS Icons SVG
+    const SVG_APPLE = `<svg class="w-3.5 h-3.5 fill-current inline-block mr-1" viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 0.93-2.85-.9.04-1.99.6-2.64 1.35-.57.65-1.07 1.72-.94 2.74 1.01.08 2.03-.49 2.65-1.24z"/></svg>`;
+    const SVG_WINDOWS = `<svg class="w-3.5 h-3.5 fill-current inline-block mr-1" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.051-1.701"/></svg>`;
+
+    // --- NAVIGATION CONTROLLER ---
+    function navigateTo(pageId) {
+      state.activePage = pageId;
+      const page1El = document.getElementById('page1');
+      const page2El = document.getElementById('page2');
+      const headerControls = document.getElementById('page2HeaderControls');
+
+      if (pageId === 'page1') {
+        page1El.classList.remove('hidden');
+        page2El.classList.add('hidden');
+        headerControls.classList.add('hidden');
+        startCarousel();
+      } else {
+        page1El.classList.add('hidden');
+        page2El.classList.remove('hidden');
+        headerControls.classList.remove('hidden');
+        headerControls.classList.add('flex');
+        stopCarousel();
+        renderHeaderOS();
+        updateAppTypeLabels();
+      }
+    }
+
+    // --- PAGE 1 CAROUSEL ---
+    function startCarousel() {
+      if (carouselInterval) clearInterval(carouselInterval);
+      const textEl = document.getElementById('carouselText');
+      if (!textEl) return;
+
+      carouselInterval = setInterval(() => {
+        textEl.classList.add('-translate-y-3', 'opacity-0');
+        setTimeout(() => {
+          carouselIdx = (carouselIdx + 1) % CAROUSEL_MESSAGES.length;
+          textEl.textContent = CAROUSEL_MESSAGES[carouselIdx];
+          textEl.classList.remove('-translate-y-3');
+          textEl.classList.add('translate-y-3');
+          setTimeout(() => {
+            textEl.classList.remove('translate-y-3', 'opacity-0');
+          }, 50);
+        }, 250);
+      }, 2900);
+    }
+
+    function stopCarousel() {
+      if (carouselInterval) clearInterval(carouselInterval);
+    }
+
+    // --- OS SWITCHER LOGIC ---
+    function toggleOS() {
+      state.selectedOS = state.selectedOS === 'macOS' ? 'Windows' : 'macOS';
+      renderHeaderOS();
+      updateAppTypeLabels();
+      if (state.showDiagnostics) {
+        generateDiagnosticPayload();
+      }
+    }
+
+    function renderHeaderOS() {
+      const el = document.getElementById('headerOsDisplay');
+      if (state.selectedOS === 'macOS') {
+        el.innerHTML = `${SVG_APPLE} <span>macOS</span>`;
+      } else {
+        el.innerHTML = `${SVG_WINDOWS} <span>Windows</span>`;
+      }
+    }
+
+    function updateAppTypeLabels() {
+      const sub = document.getElementById('typeNativeSub');
+      if (sub) {
+        sub.textContent = `Ships with ${state.selectedOS}`;
+      }
+    }
+
+    // --- APP TYPE SELECTOR ---
+    function setAppType(type) {
+      state.appType = type;
+      clearError('appTypeError');
+
+      const nativeCard = document.getElementById('typeNativeCard');
+      const nativeRadio = document.getElementById('typeNativeRadio');
+      const thirdCard = document.getElementById('typeThirdCard');
+      const thirdRadio = document.getElementById('typeThirdRadio');
+
+      if (type === 'native') {
+        nativeCard.className = 'p-3.5 rounded-xl border border-emerald-500 bg-emerald-50/40 shadow-xs cursor-pointer transition-all flex items-center space-x-3';
+        nativeRadio.className = 'w-4 h-4 rounded-full border border-emerald-500 bg-emerald-500 flex items-center justify-center';
+        nativeRadio.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-white"></div>';
+
+        thirdCard.className = 'p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-100/70 hover:border-slate-300 cursor-pointer transition-all flex items-center space-x-3';
+        thirdRadio.className = 'w-4 h-4 rounded-full border border-slate-300 bg-white flex items-center justify-center';
+        thirdRadio.innerHTML = '';
+      } else {
+        thirdCard.className = 'p-3.5 rounded-xl border border-emerald-500 bg-emerald-50/40 shadow-xs cursor-pointer transition-all flex items-center space-x-3';
+        thirdRadio.className = 'w-4 h-4 rounded-full border border-emerald-500 bg-emerald-500 flex items-center justify-center';
+        thirdRadio.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-white"></div>';
+
+        nativeCard.className = 'p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-100/70 hover:border-slate-300 cursor-pointer transition-all flex items-center space-x-3';
+        nativeRadio.className = 'w-4 h-4 rounded-full border border-slate-300 bg-white flex items-center justify-center';
+        nativeRadio.innerHTML = '';
+      }
+    }
+
+    // --- FILE UPLOADER & DRAG-AND-DROP ---
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const dropzone = document.getElementById('dropzone');
+      const aura = document.getElementById('dropzoneAura');
+      dropzone.classList.add('border-emerald-500', 'bg-emerald-50/90');
+      aura.classList.add('opacity-90');
+    }
+
+    function handleDragLeave(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const dropzone = document.getElementById('dropzone');
+      const aura = document.getElementById('dropzoneAura');
+      dropzone.classList.remove('border-emerald-500', 'bg-emerald-50/90');
+      aura.classList.remove('opacity-90');
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      handleDragLeave(e);
+      processFiles(e.dataTransfer.files);
+    }
+
+    function handleFileInputChange(e) {
+      processFiles(e.target.files);
+      e.target.value = '';
+    }
+
+    function processFiles(fileList) {
+      if (!fileList || fileList.length === 0) return;
+
+      const maxCount = 6;
+      const maxSizeBytes = 25 * 1024 * 1024;
+      const allowedExt = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'mp4', 'mov', 'webm', 'log', 'txt', 'json'];
+
+      if (state.files.length + fileList.length > maxCount) {
+        showError('filesError', `Maximum ${maxCount} files allowed. You already attached ${state.files.length}.`);
+        return;
+      }
+
+      Array.from(fileList).forEach(file => {
+        const ext = file.name.split('.').pop().toLowerCase();
+
+        if (file.size > maxSizeBytes) {
+          showError('filesError', `File "${file.name}" exceeds 25 MB limit.`);
+          return;
+        }
+
+        if (!allowedExt.includes(ext) && !file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+          showError('filesError', `Format .${ext} is not supported. Use images, videos, or logs.`);
+          return;
+        }
+
+        const isVisual = file.type.startsWith('image/') || file.type.startsWith('video/');
+        const previewUrl = isVisual ? URL.createObjectURL(file) : null;
+
+        state.files.push({
+          id: 'file-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
+          name: file.name,
+          size: file.size,
+          type: file.type || ext,
+          previewUrl: previewUrl
+        });
+      });
+
+      clearError('filesError');
+      renderEvidencePreview();
+    }
+
+    function removeFile(fileId) {
+      const idx = state.files.findIndex(f => f.id === fileId);
+      if (idx !== -1) {
+        if (state.files[idx].previewUrl) {
+          URL.revokeObjectURL(state.files[idx].previewUrl);
+        }
+        state.files.splice(idx, 1);
+        renderEvidencePreview();
+      }
+    }
+
+    function renderEvidencePreview() {
+      const container = document.getElementById('evidencePreviewSection');
+      const grid = document.getElementById('evidenceGrid');
+      const countLabel = document.getElementById('evidenceCountLabel');
+
+      if (state.files.length === 0) {
+        container.classList.add('hidden');
+        grid.innerHTML = '';
+        return;
+      }
+
+      container.classList.remove('hidden');
+      countLabel.textContent = `Attached Evidence (${state.files.length}/6)`;
+
+      grid.innerHTML = state.files.map(file => {
+        const sizeKb = (file.size / 1024).toFixed(0);
+        let previewHtml = '';
+        if (file.previewUrl && file.type.startsWith('video/')) {
+          previewHtml = `<video src="${file.previewUrl}" class="w-full h-full object-cover" muted></video>`;
+        } else if (file.previewUrl) {
+          previewHtml = `<img src="${file.previewUrl}" alt="${file.name}" class="w-full h-full object-cover" />`;
+        } else {
+          previewHtml = `<span class="font-mono text-[10px] text-slate-500 font-semibold uppercase">.LOG/.TXT</span>`;
+        }
+
+        return `
+          <div class="relative group rounded-lg border border-slate-200 bg-slate-50 p-2 flex flex-col justify-between overflow-hidden text-xs">
+            <div class="w-full h-14 rounded bg-slate-200 overflow-hidden mb-1 flex items-center justify-center">
+              ${previewHtml}
+            </div>
+            <div class="truncate font-medium text-slate-700" title="${file.name}">${file.name}</div>
+            <div class="text-[10px] text-slate-400">${sizeKb} KB</div>
+            <button
+              type="button"
+              onclick="removeFile('${file.id}')"
+              class="absolute top-1 right-1 p-1 bg-white/90 hover:bg-rose-50 rounded-full shadow-xs cursor-pointer transition-colors"
+              title="Remove file"
+            >
+              <svg class="w-3.5 h-3.5 text-slate-400 hover:text-rose-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+              </svg>
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // --- FORM VALIDATION & SUBMISSION ---
+    function showError(elementId, message) {
+      const el = document.getElementById(elementId);
+      if (el) {
+        el.textContent = message;
+        el.classList.remove('hidden');
+      }
+    }
+
+    function clearError(elementId) {
+      const el = document.getElementById(elementId);
+      if (el) {
+        el.textContent = '';
+        el.classList.add('hidden');
+      }
+    }
+
+    function handleSendReport(e) {
+      if (e) e.preventDefault();
+
+      const appNameVal = document.getElementById('appNameInput').value.trim();
+      const descVal = document.getElementById('descriptionInput').value.trim();
+
+      let hasError = false;
+      if (!appNameVal) {
+        showError('appNameError', 'Application name is required.');
+        hasError = true;
+      }
+      if (!state.appType) {
+        showError('appTypeError', 'Please select an application type.');
+        hasError = true;
+      }
+      if (!descVal) {
+        showError('descriptionError', 'Please describe what happened.');
+        hasError = true;
+      }
+
+      if (hasError) return;
+
+      state.appName = appNameVal;
+      state.description = descVal;
+
+      // Button loading state
+      const sendIcon = document.getElementById('sendBtnIcon');
+      const sendSpinner = document.getElementById('sendBtnSpinner');
+      const sendBtn = document.getElementById('sendBtn');
+      sendIcon.classList.add('hidden');
+      sendSpinner.classList.remove('hidden');
+      sendBtn.disabled = true;
+
+      const now = () => new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      // Initialize logs
+      state.terminalLogs = [
+        { time: now(), text: `Incident payload received for [${state.appName}].`, level: 'info' },
+        { time: now(), text: `Operating System: ${state.selectedOS} · Mode: ${state.appType === 'native' ? 'Platform Native' : 'Third-Party Binary'}`, level: 'dim' },
+        { time: now(), text: `Evidence package contains ${state.files.length} attached items.`, level: 'info' }
+      ];
+      renderTerminalLogs();
+
+      setTimeout(() => {
+        state.terminalLogs.push({ time: now(), text: 'Local telemetry triage engine initializing (Demo Sandbox)...', level: 'info' });
+        renderTerminalLogs();
+      }, 250);
+
+      setTimeout(() => {
+        state.terminalLogs.push(
+          { time: now(), text: 'Synthesized crash pattern matched: EXC_BAD_ACCESS / SIGSEGV memory fault.', level: 'warn' },
+          { time: now(), text: 'Diagnostics isolated: Root cause identified with 94.2% confidence.', level: 'success' }
+        );
+        renderTerminalLogs();
+
+        // Restore button
+        sendIcon.classList.remove('hidden');
+        sendSpinner.classList.add('hidden');
+        sendBtn.disabled = false;
+
+        // Reveal diagnostics panel
+        state.showDiagnostics = true;
+        document.getElementById('preDiagnosticHint').classList.add('hidden');
+        const diagContainer = document.getElementById('diagnosticContainer');
+        diagContainer.classList.remove('hidden');
+
+        generateDiagnosticPayload();
+
+        // Smooth scroll to diagnostic panel
+        setTimeout(() => {
+          diagContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 120);
+      }, 650);
+    }
+
+    // --- DIAGNOSTICS & TELEMETRY ---
+    function renderTerminalLogs() {
+      const container = document.getElementById('terminalLogOutput');
+      if (!container) return;
+
+      container.innerHTML = state.terminalLogs.map(log => {
+        let colorClass = 'text-cyan-300';
+        if (log.level === 'success') colorClass = 'text-emerald-400 font-medium';
+        if (log.level === 'warn') colorClass = 'text-amber-300';
+        if (log.level === 'dim') colorClass = 'text-slate-400';
+
+        return `
+          <div class="flex items-start space-x-2">
+            <span class="text-slate-500 select-none">[${log.time}]</span>
+            <span class="${colorClass}">${log.text}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function generateDiagnosticPayload() {
+      const incidentId = 'CS-' + Math.floor(100000 + Math.random() * 900000);
+      const safeCommand = state.selectedOS === 'macOS'
+        ? `defaults write com.videolan.${state.appName.toLowerCase() || 'app'} HardwareAcceleration -bool false && rm -rf ~/Library/Caches/${state.appName.toLowerCase() || 'app'}`
+        : `Remove-Item -Path "$env:LOCALAPPDATA\\${state.appName || 'App'}\\Cache\\*" -Recurse -Force`;
+
+      state.diagnosticData = {
+        incident_id: incidentId,
+        timestamp: new Date().toISOString(),
+        host: {
+          platform: state.selectedOS,
+          target_application: state.appName || 'VLC',
+          distribution: state.appType === 'native' ? 'Platform Native' : 'Third-Party Binary'
+        },
+        analysis_status: 'Completed (Demo Engine)',
+        gemma_connection: 'Offline / Demo Emulation Only',
+        primary_diagnosis: {
+          error_class: 'Null Pointer Dereference (SIGSEGV)',
+          confidence_score: 0.942,
+          severity: 'High - Immediate Crash',
+          fault_location: 'libsystem_kernel.dylib -> thread_suspend()'
+        },
+        probable_root_cause: 'The host rendering pipeline encountered an invalid memory address while attempting to blit an unaccelerated video frame buffer into hardware surface.',
+        recommended_mitigation: {
+          action_name: 'Safe Cache Invalidation & Hardware Acceleration Toggle',
+          safe_command: safeCommand,
+          safe_to_execute: false,
+          requires_user_approval: true
+        }
+      };
+
+      // Update UI elements
+      document.getElementById('diagnosticIncidentId').textContent = incidentId;
+      document.getElementById('diagnosticTargetApp').textContent = state.appName || 'Application';
+      document.getElementById('diagnosticTargetOS').textContent = state.selectedOS;
+      document.getElementById('envOsLabel').textContent = state.selectedOS;
+      document.getElementById('envPkgLabel').textContent = state.appType === 'native' ? 'Platform Native' : 'Third-Party Binary';
+      document.getElementById('envEvidenceLabel').textContent = `${state.files.length} items`;
+      document.getElementById('remediationCommandCode').textContent = safeCommand;
+      document.getElementById('jsonDiagnosticPre').textContent = JSON.stringify(state.diagnosticData, null, 2);
+    }
+
+    // --- CLIPBOARD ACTIONS (document.execCommand safe implementation) ---
+    function copyTextToClipboard(text, buttonEl, successText = 'Copied') {
+      const tempArea = document.createElement('textarea');
+      tempArea.value = text;
+      tempArea.setAttribute('readonly', '');
+      tempArea.style.position = 'fixed';
+      tempArea.style.left = '-9999px';
+      document.body.appendChild(tempArea);
+      tempArea.select();
+      
+      try {
+        document.execCommand('copy');
+        const origText = buttonEl.textContent;
+        buttonEl.textContent = successText;
+        setTimeout(() => {
+          buttonEl.textContent = origText;
+        }, 2000);
+      } catch (err) {
+        console.error('Copy fallback failed', err);
+      } finally {
+        document.body.removeChild(tempArea);
+      }
+    }
+
+    function copyJsonPayload() {
+      if (!state.diagnosticData) return;
+      const btn = document.getElementById('copyJsonBtn');
+      copyTextToClipboard(JSON.stringify(state.diagnosticData, null, 2), btn, '✓ Copied');
+    }
+
+    function copyRemediationCommand() {
+      if (!state.diagnosticData) return;
+      const btn = document.getElementById('copyCmdBtn');
+      copyTextToClipboard(state.diagnosticData.recommended_mitigation.safe_command, btn, 'Copied');
+    }
+
+    // --- REPAIR SIMULATION ACTION ---
+    function handleSimulateAction() {
+      if (state.simulatedState !== 'idle') return;
+
+      const btn = document.getElementById('simulateBtn');
+      const btnText = document.getElementById('simulateBtnText');
+
+      state.simulatedState = 'executing';
+      btn.className = 'inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs font-semibold bg-slate-700 text-slate-300 cursor-wait';
+      btnText.innerHTML = '<span class="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin mr-1.5 inline-block"></span> Testing in Sandbox...';
+
+      setTimeout(() => {
+        state.simulatedState = 'done';
+        btn.className = 'inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs font-semibold bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 cursor-default';
+        btnText.textContent = '✓ Simulation Complete (Safe)';
+
+        const now = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        state.terminalLogs.push({
+          time: now,
+          text: 'Simulated sandbox test verified: No destructive file deletion requested.',
+          level: 'success'
+        });
+        renderTerminalLogs();
+      }, 900);
+    }
+
+    // Initialize application on window load
+    window.onload = function() {
+      startCarousel();
+      renderHeaderOS();
+    };
+  </script>
+</body>
+</html>
